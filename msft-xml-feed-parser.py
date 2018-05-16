@@ -9,7 +9,7 @@ import sys
 def intervalScheduler(function, interval):
     # configure interval to refresh the AdBlocker (in seconds, 3600s = 1h, 86400s = 1d)
     setInterval = interval
-    AdBlocker = function
+    XMLFeedParser = function
 
     # user feedback
     sys.stdout.write("\n")
@@ -19,9 +19,9 @@ def intervalScheduler(function, interval):
     # interval loop, unless keyboard interrupt
     try:
         while True:
-            AdBlocker()
+            XMLFeedParser()
             sys.stdout.write("\n")
-            sys.stdout.write("XML Feed Parser updated!\n")
+            sys.stdout.write("XML Feed updated!\n")
             sys.stdout.write("\n")
             time.sleep(setInterval)
     # handle keyboard interrupt
@@ -120,7 +120,7 @@ try:
     XMLFeedParser()
     
     # uncomment when using the intervalScheduler for automatic refreshing
-    #intervalScheduler(AdBlocker, 86400)
+    #intervalScheduler(XMLFeedParser, 86400)
 except (KeyboardInterrupt, SystemExit):
     sys.stdout.write("\n")
     sys.stdout.write("\n")
