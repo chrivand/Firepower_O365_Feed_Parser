@@ -4,7 +4,7 @@ This is a script that parses the XML feed (https://support.content.office.net/en
 
 ## Getting Started with the Installation
 
-These instructions will enable you to download the script and run it, so that the output can be used in Firepower as a network object. Another option is to use the raw Github file links below and use it as feed in Firepower:
+These instructions will enable you to download the script and run it, so that the output can be used in Firepower as a network object. Another option is to use the raw Github file links below and use it as feed in Firepower (please be aware that I am currently NOT refreshing the script constantly, I am looking for a location to host it):
 
 URL TXT file: https://raw.githubusercontent.com/chrivand/Firepower_O365_Feed_Parser/master/Parsed_File_URL.txt
 IPv4 TXT file: https://raw.githubusercontent.com/chrivand/Firepower_O365_Feed_Parser/master/Parsed_File_IPv4.txt
