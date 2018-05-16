@@ -7,7 +7,7 @@ XML_URL = 'https://support.content.office.net/en-us/static/O365IPAddresses.xml'
 r = requests.get(XML_URL, allow_redirects=True)
 XML_File = open('O365IPAddresses.xml', 'r')
 
-# overwrite old files with files
+# overwrite old files with files or create new the first time (path has to be changed)
 Parsed_File_URL = open('/Users/christophervandermade/Desktop/MicrosoftXMLFeedParser/Parsed_File_URL.txt', 'w+')
 Parsed_File_IPv4 = open('/Users/christophervandermade/Desktop/MicrosoftXMLFeedParser/Parsed_File_IPv4.txt', 'w+')
 Parsed_File_IPv6 = open('/Users/christophervandermade/Desktop/MicrosoftXMLFeedParser/Parsed_File_IPv6.txt', 'w+')
@@ -45,7 +45,8 @@ for IPv6 in IPv6_List:
 
 # TO DO: upload TXT files to Firepower as objects (either through API, or by hosting online them and use them as Network Object Feed)
 
-#/api/fmc_config/v1/domain/{domain_UUID}/object/networks/{object_UUID}
+# https://<management_center_IP_or_name>:<https_port>/<object_URL>/object_UUIDoptions
+# /api/fmc_config/v1/domain/{domain_UUID}/object/networks/{object_UUID}
 
 
 #close the opened files, end of script
