@@ -7,7 +7,7 @@ import sys
 
 # thishis is an EXAMPLE function that can be used to schedule the Parser to refresh at intervals. Takes the XMLFeedParser function and the interval as parameters.
 def intervalScheduler(function, interval):
-    # configure interval to refresh the AdBlocker (in seconds, 3600s = 1h, 86400s = 1d)
+    # configure interval to refresh the XMLFeedParser (in seconds, 3600s = 1h, 86400s = 1d)
     setInterval = interval
     XMLFeedParser = function
 
@@ -114,7 +114,7 @@ def XMLFeedParser():
     Parsed_File_IPv6.close
 
 # run the function (interval can also be used)
-# call the AdBlocker function so that it gets executed in this file, 
+# call the XMLFeedParser function so that it gets executed in this file, 
 try:
     # comment out if using the intervalScheduler for automatic refreshing
     XMLFeedParser()
