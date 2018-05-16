@@ -45,7 +45,7 @@ for IPv6 in IPv6_List:
 
 # TO DO: upload TXT files to Firepower as objects (either through API, or by hosting online them and use them as Network Object Feed)
 
-/api/fmc_config/v1/domain/{domain_UUID}/object/networks/{object_UUID}
+#/api/fmc_config/v1/domain/{domain_UUID}/object/networks/{object_UUID}
 
 
 #close the opened files, end of script
