@@ -6,7 +6,4 @@ This is a script that parses the XML feed (https://support.content.office.net/en
 
 These instructions will enable you to download the script and run it, so that the output can be used in Firepower as a network object.
 
-
-
-
-Written by Christopher van der Made
+Written by Christopher van der Made (Cisco)
