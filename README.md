@@ -1,4 +1,4 @@
-# Firepower_O365_Feed_Parser
+# Firepower_O365_Feed_Parser (PROOF OF CONCEPT, NO PRODUCTION SCRIPT (YET))
 
 This is a script that parses the XML feed (https://support.content.office.net/en-us/static/O365IPAddresses.xml) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (Office 365). The script will parse the XML file into 3 separate TXT files. Those can be used to create network objects in Firepower.
 
