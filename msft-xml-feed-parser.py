@@ -6,6 +6,10 @@ import requests
 import sys
 import hashlib
 
+# define global variables
+CurrentMD5
+XML_URL = 'https://support.content.office.net/en-us/static/O365IPAddresses.xml'
+
 # this is is an EXAMPLE function that can be used to schedule the Parser to refresh at intervals. Takes the XMLFeedParser function and the interval as parameters.
 def intervalScheduler(function, interval):
     # configure interval to refresh the XMLFeedParser (in seconds, 3600s = 1h, 86400s = 1d)
@@ -45,9 +49,10 @@ def md5(fname):
 # function to pare the XML feed, so that it can be called iteratively (e.g by the scheduler)
 def XMLFeedParser():
     # download file from Microsoft and open it for read
-    XML_URL = 'https://support.content.office.net/en-us/static/O365IPAddresses.xml'
+    #XML_URL = 'https://support.content.office.net/en-us/static/O365IPAddresses.xml'
     r = requests.get(XML_URL, allow_redirects=True)
     XML_File = open('O365IPAddresses.xml', 'r')
+    CurrentMD5 = md5(XML_File)
 
     # user feed back
     sys.stdout.write("\n")
@@ -122,14 +127,20 @@ def XMLFeedParser():
     Parsed_File_IPv4.close
     Parsed_File_IPv6.close
 
-# run the function (interval can also be used)
-# call the XMLFeedParser function so that it gets executed in this file, 
+##############END FUNCTIONS##############START SCRIPT##############
+
 try:
-    # comment out if using the intervalScheduler for automatic refreshing
-    XMLFeedParser()
-    
-    # uncomment when using the intervalScheduler for automatic refreshing
-    #intervalScheduler(XMLFeedParser, 86400)
+    # check if XML File changed by checking the MD5
+    r = requests.get(XML_URL, allow_redirects=True)
+    XML_File_New = open('O365IPAddresses.xml', 'r')
+    NewMD5 = md5(XML_File_New)
+        if(CurrentMD5 != NewMD5):   
+            
+            # call the XMLFeedParser function so that it gets executed in this file (interval can also be used -> comment out)
+            XMLFeedParser()
+            
+            # uncomment when using the intervalScheduler for automatic refreshing (1hr)
+            #intervalScheduler(XMLFeedParser, 3600)
 except (KeyboardInterrupt, SystemExit):
     sys.stdout.write("\n")
     sys.stdout.write("\n")
