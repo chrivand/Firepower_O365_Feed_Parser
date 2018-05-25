@@ -4,8 +4,9 @@
 import xml.etree.ElementTree as ET
 import requests
 import sys
+import hashlib
 
-# thishis is an EXAMPLE function that can be used to schedule the Parser to refresh at intervals. Takes the XMLFeedParser function and the interval as parameters.
+# this is is an EXAMPLE function that can be used to schedule the Parser to refresh at intervals. Takes the XMLFeedParser function and the interval as parameters.
 def intervalScheduler(function, interval):
     # configure interval to refresh the XMLFeedParser (in seconds, 3600s = 1h, 86400s = 1d)
     setInterval = interval
@@ -32,6 +33,14 @@ def intervalScheduler(function, interval):
         sys.stdout.write("\n")
         sys.stdout.flush()
         pass
+
+# this function calculates the MD5 hash of a file. this can be used to calculate the MD5 of the previous XML file with the new one. If it changed, the XMLFeedParser fucntion can be called to update the objects.
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 # function to pare the XML feed, so that it can be called iteratively (e.g by the scheduler)
 def XMLFeedParser():
