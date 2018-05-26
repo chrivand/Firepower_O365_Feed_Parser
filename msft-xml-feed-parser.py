@@ -5,6 +5,8 @@ import xml.etree.ElementTree as ET
 import requests
 import sys
 import hashlib
+import json
+import time
 
 # define global variables
 CurrentMD5
@@ -38,7 +40,8 @@ def intervalScheduler(function, interval):
         sys.stdout.flush()
         pass
 
-# this function calculates the MD5 hash of a file. this can be used to calculate the MD5 of the previous XML file with the new one. If it changed, the XMLFeedParser fucntion can be called to update the objects.
+# this function calculates the MD5 hash of a file. this can be used to calculate the MD5 of the previous XML file with the new one. 
+# If it changed, the XMLFeedParser fucntion can be called to update the objects.
 def md5(fname):
     hash_md5 = hashlib.md5()
     with open(fname, "rb") as f:
@@ -141,6 +144,12 @@ try:
             
             # uncomment when using the intervalScheduler for automatic refreshing (1hr)
             #intervalScheduler(XMLFeedParser, 3600)
+        if(CurrentMD5 == NewMD5):
+            # user feed back
+            sys.stdout.write("\n")
+            sys.stdout.write("XML feed has not been updated!\n") 
+            sys.stdout.write("\n")
+
 except (KeyboardInterrupt, SystemExit):
     sys.stdout.write("\n")
     sys.stdout.write("\n")
