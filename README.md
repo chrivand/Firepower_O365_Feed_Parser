@@ -8,10 +8,10 @@ These instructions will enable you to download the script and run it, so that th
 
 ### So, what do you need to get started?
 
-* Create 3 Group Objects in FMC: "O365_XML_URL" (URL Group Object), "O365_XML_IPv4" (Network Group Object) and "O365_XML_IPv6" (Network Group Object)
+* Create 3 Group Objects in FMC: *"O365_XML_URL"* (URL Group Object), *"O365_XML_IPv4"* (Network Group Object) and *"O365_XML_IPv6"* (Network Group Object)
 * Use either the FMC API Explorer, or a Script, to do a GET request for the group objects. Write down the Object ID's (e.g. "000C2943-1B6C-0ec3-0000-035789805120"). You will need these later in the PUT requests to update the objects.
 * Furthermore you need the IP address (or domain) of the FMC, the username and password. These are added to the API caller function and also for the FMC API explorer. 
-* The FMC API explorer can be reached at https://<IP-address of FMC>/api/api-explorer
+* The FMC API explorer can be reached at https://IP-addressOfFMC/api/api-explorer
 * Recommended is also to download a SSL certificate from FMC and put it in the same folder as the scripts. 
 * You will also need the correct API path, it is in the script already, however there is a unique identifier for the domain. This can be obtained from the FMC API explorer.
 * Please test this properly before implementing in a production environment. 
