@@ -1,7 +1,6 @@
-# NOTE: this is a proof of concept script, please test before using in production!
+# NOTE: this is a Proof of Concept script, please test before using in production!
 
-# Python example script showing proper use of the Cisco Sample Code header.
-# Copyright (c) {{current_year}} Cisco and/or its affiliates.
+# Copyright (c) 2018 Cisco and/or its affiliates.
 # This software is licensed to you under the terms of the Cisco Sample
 # Code License, Version 1.0 (the "License"). You may obtain a copy of the
 # License at
@@ -13,25 +12,24 @@
 # IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied.
 
-
-# import objects
+# import libraries
 import xml.etree.ElementTree as ET
 import requests
 import sys
 import hashlib
 import json
 import time
-# import additional functions from extra file
+# import supporting functions from additional file
 from XMLParserFunctions import APIcaller, intervalScheduler, md5
 
-# define global variables
+# define global variables, CurrentMD5 will be updated every time script refreshes
 CurrentMD5 = ""
 XML_URL = 'https://support.content.office.net/en-us/static/O365IPAddresses.xml'
 
 
-# function to pare the XML feed, so that it can be called iteratively (e.g by the scheduler)
+# function to parse the XML feed, so that it can be called iteratively (e.g by the scheduler function)
 def XMLFeedParser():
-    # download file from Microsoft and open it for read
+    # download file from Microsoft and open it for reading
     r = requests.get(XML_URL, auth=('user', 'pass'))
     with open('O365IPAddresses.xml', 'wb') as XML_File:
         XML_File.write(r.content)
@@ -44,11 +42,11 @@ def XMLFeedParser():
         sys.stdout.write("XML file successfully downloaded!\n") 
         sys.stdout.write("\n")
 
-    #calculate MD5
+    # calculate MD5 to check if XML file was updated
     global CurrentMD5
     NewMD5 = md5(XML_File.name)
     
-    # if MD5 changed, parse XML file and make API calls
+    # if MD5 changed, the XML file was updated, so it will be parsed and API calls will be done to update FMC Group Objects
     if(CurrentMD5 != NewMD5):   
         # user feed back
         sys.stdout.write("\n")
@@ -85,7 +83,7 @@ def XMLFeedParser():
                     IPv6_List.append(address.text)
 
         
-        # API call for URL list
+        # API call for URL list (user feedback is provided from the APIcaller function)
         object_id_url = "000C2943-1B9D-0ed3-0000-025769805102"
         objectgroup_name_url = "O365_XML_URL"
         object_type_url = "Url"
@@ -112,23 +110,23 @@ def XMLFeedParser():
         object_field_ipv6 = "value"
         APIcaller(object_id_ipv6, objectgroup_name_ipv6, object_type_ipv6, objectgroup_type_ipv6, put_list_ipv6, object_field_ipv6)
         
-    
+    # if the MD5 did not change, the XML file was not updated. 
     if(CurrentMD5 == NewMD5):
         # user feed back
         sys.stdout.write("\n")
-        sys.stdout.write("XML feed has not been updated, no API calls needed!\n") 
+        sys.stdout.write("XML feed has NOT been updated, no API calls needed!\n") 
         sys.stdout.write("\n")
 
     # close file after API calls
     XML_File.close
 
-##############END FUNCTION##############START EXECUTION SCRIPT##############
+##############END PARSE FUNCTION##############START EXECUTION SCRIPT##############
 
 try:
-    # uncomment for executing just once
+    # uncomment for executing XMLFeedParser just once
     #XMLFeedParser()
 
-    # uncomment when using the intervalScheduler for automatic refreshing (pass function and seconds)
+    # calls the intervalScheduler for automatic refreshing (pass XMLFeedParser function and interval in seconds (1 hour = 3600 seconds))
     intervalScheduler(XMLFeedParser, 15) 
 
 except (KeyboardInterrupt, SystemExit):

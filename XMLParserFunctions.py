@@ -18,8 +18,10 @@ import sys
 import hashlib
 import json
 import time
+import datetime
 
-# this is is an EXAMPLE function that can be used to schedule the Parser to refresh at intervals. Takes the XMLFeedParser function and the interval as parameters.
+# Function that can be used to schedule the XMLParser to refresh at intervals. Caution: this creates an infinite loop.
+# Takes the XMLFeedParser function and the interval as parameters. 
 def intervalScheduler(function, interval):
     # configure interval to refresh the XMLFeedParser (in seconds, 3600s = 1h, 86400s = 1d)
     setInterval = interval
@@ -33,11 +35,15 @@ def intervalScheduler(function, interval):
     # interval loop, unless keyboard interrupt
     try:
         while True:
-            XMLFeedParser()
-            sys.stdout.write("\n")
-            sys.stdout.write("IntervalScheduler executed, current interval is %d seconds!\n" %interval)
-            sys.stdout.write("\n")
-            time.sleep(setInterval)
+        	XMLFeedParser()
+        	# get current time, for user feedback
+        	date_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        	sys.stdout.write("\n")
+        	sys.stdout.write("[%s] XMLFeedParser executed by IntervalScheduler, current interval is %d seconds. Please use ctrl-C to exit.\n" % (date_time, interval))
+        	sys.stdout.write("\n")
+        	# sleep for X amount of seconds and then run again. Caution: this creates an infinite loop to check the XML file for changes
+        	time.sleep(setInterval)
+
     # handle keyboard interrupt
     except (KeyboardInterrupt, SystemExit):
         sys.stdout.write("\n")
@@ -47,7 +53,8 @@ def intervalScheduler(function, interval):
         sys.stdout.flush()
         pass
 
-# this function calculates the MD5 hash of a file. this can be used to calculate the MD5 of the previous XML file with the new one. 
+# Function to calculate the MD5 hash of a file. This can be used to check if the XML file was updateds. 
+# Takes file name as parameter (e.g. the XML file)
 def md5(fname):
     hash_md5 = hashlib.md5()
     with open(fname, "rb") as f:
@@ -56,14 +63,15 @@ def md5(fname):
     return hash_md5.hexdigest()
 
 # Function to make API calls to FMC
+# Takes multiple parameters to be used for the API call
 def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_list, object_field):
-	# Disable warnings regarding Certs, please use certs in production
+	# Disable warnings regarding Certs. Caution: please use certs in production for better security
 	requests.packages.urllib3.disable_warnings()
 
-	# input FMC IP
+	# input FMC IP/url
 	server = "https://10.10.10.72"
 
-	# input FMC username
+	# input FMC username (Tip: create a separate admin account for this function, otherwise user will be logged out during API calls)
 	username = "admin"
 	if len(sys.argv) > 1:
 		username = sys.argv[1]
@@ -73,6 +81,7 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	if len(sys.argv) > 2:
 		password = sys.argv[2]
 
+	# initiate r for the API request
 	r = None
 	headers = {'Content-Type': 'application/json'}
 	api_auth_path = "/api/fmc_platform/v1/auth/generatetoken"
@@ -81,15 +90,15 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 		######### !IMPORTANT! 2 ways of making a REST call are provided: !IMPORTANT! #########
 		# One with "SSL verification turned off" and the other with "SSL verification turned on".
 		# The one with "SSL verification turned off" is uncommented. If you like to use the other then
-		# uncomment the line where "verify='/path/to/ssl_certificate'"" and comment the line with "verify=False" (this is recommended!)
+		# uncomment the line where "verify='/path/to/ssl_certificate'"" and comment the line with "verify=False" 
 		
-		# REST call with SSL verification turned off:
+		# REST call with SSL verification turned off (NOT RECOMMENDED, TESTING ONLY):
 		r = requests.post(auth_url, headers=headers, auth=requests.auth.HTTPBasicAuth(username,password), verify=False)
 		
-		# REST call with SSL verification turned on: Download SSL certificates from your FMC first and provide its path for verification.
+		# REST call with SSL verification turned on: Download SSL certificates from your FMC first and provide its path for verification (RECOMMENDED FOR PRODUCTION)
 		#r = requests.post(auth_url, headers=headers, auth=requests.auth.HTTPBasicAuth(username,password), verify='/path/to/ssl_certificate')
 		
-		# create rest of headers
+		# generate an authetication token
 		auth_headers = r.headers
 		auth_token = auth_headers.get('X-auth-access-token', default=None)
 		if auth_token == None:
@@ -101,10 +110,8 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 
 	headers['X-auth-access-token']=auth_token
 
-	# Define API path 
-	api_path = "/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f/object/" + objectgroup_type + "s/" + object_id
-	#api_path = "/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f/object/networkgroups/" + object_id
-	#api_path = "/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f/object/networkgroups/000C2943-1B9D-0ed3-0000-025769805120"    
+	# Define API path by using parameters that were passed in function to complete. (Tip: you can easily create this path with the FMC API Explorer)
+	api_path = "/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f/object/" + objectgroup_type + "s/" + object_id    
 	url = server + api_path
 	if (url[-1] == '/'):
 	    url = url[:-1]
@@ -114,15 +121,16 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	object_dict = {}
 	group_list = []
 
-	# loop through list and put in right format for API call, all fields come from function call
+	# loop through list and put in right format for API call, all fields come from passed parameters in function
 	for element in put_list:
 		object_dict["type"] = object_type
 		object_dict[object_field] = element # VALUE
 		group_list.append(object_dict.copy())
 
+	# create empty dictionary to finish JSON format
 	put_data = {}
 
-	# add extra fields to JSON
+	# add fields to dictionary, to finish the JSON needed to pass to FMC with API call
 	put_data["id"] = object_id
 	put_data["name"] = objectgroup_name
 	put_data["type"] = objectgroup_type
@@ -136,7 +144,7 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	    status_code = r.status_code
 	    resp = r.text
 	    if (status_code == 200):
-	        print("Put was successful...")
+	        print("PUT request was successful, output below:\n")
 	        json_resp = json.loads(resp)
 	        print(json.dumps(json_resp,sort_keys=True,indent=4, separators=(',', ': ')))
 	    else:
@@ -148,24 +156,4 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	finally:
 	    if r: r.close()
 
-	try:
-	    # REST call with SSL verification turned off (NOT RECOMMENDED, TESTING ONLY)
-	    r = requests.put(url, data=json.dumps(put_data), headers=headers, verify=False)
-	    # REST call with SSL verification turned on (RECOMMENDED FOR PRODUCTION)
-	    #r = requests.put(url, data=json.dumps(put_data), headers=headers, verify='/path/to/ssl_certificate')
-	    status_code = r.status_code
-	    resp = r.text
-	    if (status_code == 200):
-	        print("Put was successful, output below:")
-	        json_resp = json.loads(resp)
-	        print(json.dumps(json_resp,sort_keys=True,indent=4, separators=(',', ': ')))
-	    else:
-	        r.raise_for_status()
-	        print("Status code:-->"+status_code)
-	        print("Error occurred in PUT --> "+resp)
-	except requests.exceptions.HTTPError as err:
-	    print ("Error in connection --> "+str(err))
-	finally:
-	    if r: r.close()
- 
-
+# end of script
