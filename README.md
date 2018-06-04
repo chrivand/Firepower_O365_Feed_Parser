@@ -6,7 +6,7 @@ This is a script that parses the XML feed (https://support.content.office.net/en
 
 These instructions will enable you to download the script and run it, so that the output can be used in Firepower as Group Objects. The script consists of 2 python files. The main script needs to run (indefintely) and a function is built in to rerun the script every x amount of seconds. Then, using the MD5 hash of the XML file, it is checked if changes were made to the XML file. If changes happened, the XML file is parsed and uploaded using a PUT request to FMC. Important is to use SSL verification and to test the script before running this in a production environment. Also, please be aware that a policy redeploy is needed to update the policies. Currently there is no API call built in to do a policy redeploy, since this might cause other unfinished policies or objects to be deployed (e.g. if a network administrator is working in the GUI). This can be done using the API as well, if preferred. 
 
-###So, what do you need to get started?
+### So, what do you need to get started?
 
 * Create 3 Group Objects in FMC: "O365_XML_URL" (URL Group Object), "O365_XML_IPv4" (Network Group Object) and "O365_XML_IPv6" (Network Group Object)
 * Use either the FMC API Explorer, or a Script, to do a GET request for the group objects. Write down the Object ID's (e.g. "000C2943-1B6C-0ec3-0000-035789805120"). You will need these later in the PUT requests to update the objects.
