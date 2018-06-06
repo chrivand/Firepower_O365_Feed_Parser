@@ -1,19 +1,28 @@
 # Firepower O365 Feed Parser
 
-_This is a Sample Script that can parse the O365 XML file and upload it to Firepower Management Center as Group Obejcts._
+_This is a Sample Script that can parse the O365 XML file and upload it to Firepower Management Center as Group Objects._
 
 ---
 
-This is a script that parses the XML feed (https://support.content.office.net/en-us/static/O365IPAddresses.xml) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (Office 365). The script will parse the XML file into 3 separate lists and use the FMC API's to upload them to 3 Group Objects. These Group Objects can be used in a Firepower trust rule. By doing so the traffic is excluded from further inspection, to ensure low latency. 
+This is a script that parses the XML feed (https://support.content.office.net/en-us/static/O365IPAddresses.xml) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (Office 365). The script will parse the XML file into 3 separate lists and use the FMC API's to upload them to 3 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to ensure low latency. 
 
 ## Features
 
-* Project feature
+* Parsing O365 XML File;
+* Checking if O365 file was updated, using MD5 hashes;
+* Checking for updates with a specified interval (in seconds, 3600s = 1h);
+* Creating right JSON format for FMC API PUT requests;
+* Uploading this JSON to FMC, overwriting the previous object.
+
+### Potential next steps
+
+* Email / Webex Teams alert when changes were made to Objects;
+* Automatic policy deploy using API when changes were made to Objects.
 
 
 ## Solution Components
 
-The script consists of 2 python files. The main script needs to run (indefintely) and a function is built in to rerun the script every x amount of seconds. Then, using the MD5 hash of the XML file, it is checked if changes were made to the XML file. If changes happened, the XML file is parsed and uploaded using a PUT request to FMC. Important is to use SSL verification and to test the script before running this in a production environment. Also, please be aware that a policy redeploy is needed to update the policies. Currently there is no API call built in to do a policy redeploy, since this might cause other unfinished policies or objects to be deployed (e.g. if a network administrator is working in the GUI). This can be done using the API as well, if preferred. 
+The script consists of 2 python files. The main script needs to run (indefintely) and a function is built in to rerun the script every x amount of seconds. Then, using the MD5 hash of the XML file, it is checked if changes were made to the XML file. If changes happened, the XML file is parsed and uploaded using a PUT request to FMC. Important is to use SSL verification and to test the script before running this in a production environment. Also, please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is no API call built in to do a policy redeploy, since this might cause other unfinished policies or objects to be deployed (e.g. if a network administrator is working on a Policy in the GUI). This can be done using the API as well, if preferred. 
 
 ### Cisco Products / Services
 
@@ -43,7 +52,7 @@ These instructions will enable you to download the script and run it, so that th
 
 ## Documentation
 
-More instructions are in 2 sample scripts and will be elaborated on at a later point in time. Please contact me for more info...
+More instructions are in comments in the 2 sample scripts. Please find more information in the following blog post: LINK
 
 
 ## Author(s)
