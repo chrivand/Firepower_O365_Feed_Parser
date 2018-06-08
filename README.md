@@ -40,7 +40,10 @@ The script consists of 2 python files. The main script needs to run (indefintely
 
 These instructions will enable you to download the script and run it, so that the output can be used in Firepower as Group Objects. So, what do you need to get started? Please find a list below:
 
-* Create 3 Group Objects in FMC: *"O365_XML_URL"* (URL Group Object), *"O365_XML_IPv4"* (Network Group Object) and *"O365_XML_IPv6"* (Network Group Object)
+1. Create 3 Group Objects in FMC: *"O365_XML_URL"* (URL Group Object), *"O365_XML_IPv4"* (Network Group Object) and *"O365_XML_IPv6"* (Network Group Object)
+
+![Networkobjects](Firepower_O365_Feed_Parser/screenshots FMC-O365/networkgroupobjects.png)
+
 * Use either the FMC API Explorer, or a Script, to do a GET request for the group objects. Write down the Object ID's (e.g. "000C2943-1B6C-0ec3-0000-035789805120"). You will need these later in the PUT requests to update the objects.
 * Furthermore you need the IP address (or domain) of the FMC, the username and password. These are added to the API caller function and also for the FMC API explorer. It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during the API calls. 
 * The FMC API explorer can be reached at https://IP-addressOfFMC/api/api-explorer
