@@ -42,13 +42,13 @@ These instructions will enable you to download the script and run it, so that th
 
 1. Create 3 Group Objects in FMC: *"O365_XML_URL"* (URL Group Object), *"O365_XML_IPv4"* (Network Group Object) and *"O365_XML_IPv6"* (Network Group Object). At first you will have to put in a random URL/Network, to enable the objects. 
 
-* Use either the FMC API Explorer, or a Script, to do a GET request for the group objects. Write down the Object ID's (e.g. *"000C2943-1B6C-0ec3-0000-035789805120"*). You will need these later in the PUT requests to update the objects.
-* Furthermore you need the IP address (or domain) of the FMC, the username and password. These are added to the API caller function and also for the FMC API explorer. It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during the API calls. 
-* The FMC API explorer can be reached at https://IP-addressOfFMC/api/api-explorer
-* Recommended is also to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC.
-* You will also need the correct API path, it is in the script already, however there is a unique identifier for the domain. This can also be obtained from the FMC API explorer.
-* Please test this properly before implementing in a production environment. This is a sample script.
-* The running script should be hosted in a secure environment! For example: if a malicious actor can place additional IP-addresses or URL's in the list somehow, they will be put in a Firepower trust rule, and might cause the malicious actor to bypass security.
+2. Use either the FMC API Explorer, or a Script, to do a GET request for the group objects. Write down the Object ID's (e.g. *"000XXXX-YYYY-ZZZZ-0000-01234567890"*). You will need these later in the PUT requests to update the objects. The FMC API explorer can be reached at https://IP-addressOfFMC/api/api-explorer
+
+3. Furthermore you need the IP address (or domain) of the FMC, the username and password. These are added to the API caller function and obviously also needed for the FMC API explorer. It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during the API calls. 
+
+4. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification.
+
+5. You will also need the correct API path, it is in the script already, however there is a unique identifier for the domain. This can also be obtained from the FMC API explorer.
 
 
 ## Okay, I have the Group Objects, now what?
@@ -66,9 +66,19 @@ These objects can be used in either Prefilter Policy Fastpath-rule (for the Netw
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicyrule.png)
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicy.png)
 
-Or likewise this can be done in the Access Control Policy for the URL Group Object:
+Likewise, this can be done in the Access Control Policy for the URL Group Object:
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicy.png)
+![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/ACPtrustrule.png)
+
+For better understanding of the packet flow in Firepower Threat Defense, and how the Fastpath action in the Prefilter Policy works, please review the following flow diagram:
+
+![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/packetflowftd.png)
+
+Please take caution on the following notes:
+
+* Please test this properly before implementing in a production environment. This is a sample script.
+
+* The running script should be hosted in a secure environment! For example: if a malicious actor can place additional IP-addresses or URL's in the list somehow, they will be put in a Firepower trust rule, and might cause the malicious actor to bypass security.
 
 
 ## Author(s)
