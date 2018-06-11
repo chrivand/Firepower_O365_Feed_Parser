@@ -76,6 +76,9 @@ After the succesful PUT requests, the 3 Group Objects will have been updated wit
 These objects can be used in either Prefilter Policy Fastpath-rule (for the Network Objects), or in an Access Control Policy Trust-rule (for the URL Object). This is how to configure the Prefilter Policy rule in FMC:
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicyrule.png)
+
+With the end result:
+
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicy.png)
 
 Likewise, this can be done with a Trust Rule in the Access Control Policy for the URL Group Object:
