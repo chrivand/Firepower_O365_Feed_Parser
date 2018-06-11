@@ -95,7 +95,7 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 		# REST call with SSL verification turned off (NOT RECOMMENDED, TESTING ONLY):
 		r = requests.post(auth_url, headers=headers, auth=requests.auth.HTTPBasicAuth(username,password), verify=False)
 		
-		# REST call with SSL verification turned on: Download SSL certificates from your FMC first and provide its path for verification (RECOMMENDED FOR PRODUCTION)
+		# REST call with SSL verification turned on: Download SSL certificates from your FMC first and provide its path for verification (RECOMMENDED)
 		#r = requests.post(auth_url, headers=headers, auth=requests.auth.HTTPBasicAuth(username,password), verify='/path/to/ssl_certificate')
 		
 		# generate an authetication token
@@ -140,7 +140,7 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	try:
 	    # REST call with SSL verification turned off (NOT RECOMMENDED, TESTING ONLY)
 	    r = requests.put(url, data=json.dumps(put_data), headers=headers, verify=False)
-	    # REST call with SSL verification turned on (RECOMMENDED FOR PRODUCTION)
+	    # REST call with SSL verification turned on (RECOMMENDED)
 	    #r = requests.put(url, data=json.dumps(put_data), headers=headers, verify='/path/to/ssl_certificate')
 	    status_code = r.status_code
 	    resp = r.text
