@@ -4,15 +4,15 @@ _This is a Sample Script that can parse the O365 XML file and upload it to Firep
 
 ---
 
-This is a script that parses the XML feed (https://support.content.office.net/en-us/static/O365IPAddresses.xml) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (Office 365). The script will parse the XML file into 3 separate lists and use the FMC API's to upload them to 3 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to ensure low latency. 
+This is a sample script that parses the XML feed (https://support.content.office.net/en-us/static/O365IPAddresses.xml) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (Office 365). The script will parse the XML file into 3 separate lists and use the FMC API's to upload them to 3 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent  latency issues with the applications. 
 
 ## Features
 
-* Parsing O365 XML File;
 * Checking if O365 file was updated, using MD5 hashes;
-* Checking for updates with a specified interval (in seconds, 3600s = 1h);
+* Continuously checking for updates with a specified time interval;
+* Parsing O365 XML File into 3 lists;
 * Creating right JSON format for FMC API PUT requests;
-* Uploading this JSON to FMC, overwriting the previous object.
+* Uploading this JSON to FMC, overwriting the previous Group Object.
 
 ### Potential next steps
 
@@ -26,8 +26,8 @@ The script consists of 2 python files. The main script needs to run (indefintely
 
 ### Cisco Products / Services
 
-* Cisco Firepower Management Center
-* Cisco Firepower Threat Defense NGFW
+* Cisco Firepower Management Center;
+* Cisco Firepower Threat Defense NGFW.
 
 
 ## Installation
@@ -42,7 +42,13 @@ These instructions will enable you to download the script and run it, so that th
 
 4. Use the FMC API Explorer to do a GET request for the Group Objects. This is done by going into the FMC API Explorer (can be reached at https://IP-addressOfFMC/api/api-explorer), and then clicking on *"Object"* in the left menu. The scroll down to *"networkgroups"* and click on *"GET"* and then again on *"GET"* in the right menu. 
 
-5. Now you will need to copy-paste the the Object ID's of the 2 Network Group Objects (*"O365_XML_IPv4"* and *"O365_XML_IPv6"*). The ID's will look like the following format: *"000XXXX-YYYY-ZZZZ-0000-01234567890"*. This is displayed in the *"Response Text"* output box in the right menu. You will need these later in the PUT requests to update the objects. 
+5. Now you will need to copy-paste the the Object ID's of the 2 Network Group Objects (*"O365_XML_IPv4"* and *"O365_XML_IPv6"*). The ID's will look like the following format: *"000XXXX-YYYY-ZZZZ-0000-01234567890"*. This is displayed in the *"Response Text"* output box in the right menu. You will need these later in the PUT requests to update the objects. Below is an example of how this output would look for the *"O365_XML_IPv4"* Network Group Object:
+
+```
+"type": "NetworkGroup",
+"name": "O365_XML_IPv4",
+"id": "000XXXX-YYYY-ZZZZ-0000-01234567890"
+```
 
 6. You will also need the ID for the FMC Domain, to include in the API path. This can also be obtained from the FMC API explorer. When clicking on GET when doing to request above, the ID of the domain is showed in the path and has the same syntax as the Object ID's: 
 
@@ -55,7 +61,7 @@ These instructions will enable you to download the script and run it, so that th
 9. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller script.
 
 
-### Okay, I have the Group Objects, now what?
+### How to use the Group Objects in Firepower Management Center.
 
 For better understanding of the packet flow in Firepower Threat Defense, and how the Fastpath action in the Prefilter Policy works, please review the following flow diagram:
 
