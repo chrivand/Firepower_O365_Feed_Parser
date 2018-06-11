@@ -38,15 +38,17 @@ These instructions will enable you to download the script and run it, so that th
 
 2. Create 3 Group Objects in FMC: *"O365_XML_URL"* (URL Group Object), *"O365_XML_IPv4"* (Network Group Object) and *"O365_XML_IPv6"* (Network Group Object). At first you will have to put in a random URL/Network, to enable the objects. 
 
-3. Use either the FMC API Explorer, or a Script, to do a GET request for the group objects. Write down the Object ID's (e.g. *"000XXXX-YYYY-ZZZZ-0000-01234567890"*). You will need these later in the PUT requests to update the objects. The FMC API explorer can be reached at https://IP-addressOfFMC/api/api-explorer
+3. In FMC, go to System > Configuration > REST API Preferences to make sure that the REST API is enabled on the FMC.
 
-4. You will also need the correct API path, it is in the script already, however there is a unique identifier for the domain. This can also be obtained from the FMC API explorer. When clicking on GET when doing to request above, the ID of the domain is showed in the path: 
+4. Use either the FMC API Explorer, or a Script, to do a GET request for the group objects. Write down the Object ID's (e.g. *"000XXXX-YYYY-ZZZZ-0000-01234567890"*). You will need these later in the PUT requests to update the objects. The FMC API explorer can be reached at https://IP-addressOfFMC/api/api-explorer
+
+5. You will also need the correct API path, it is in the script already, however there is a unique identifier for the domain. This can also be obtained from the FMC API explorer. When clicking on GET when doing to request above, the ID of the domain is showed in the path: 
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/screenshotAPIexplorer.png)
 
-5. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification.
+6. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification.
 
-6. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC login, the Domain ID and the Group Object ID's.
+7. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC login, the Domain ID and the Group Object ID's.
 
 
 ### Okay, I have the Group Objects, now what?
