@@ -34,7 +34,7 @@ The script consists of 2 python files. The main script needs to run (indefintely
 
 These instructions will enable you to download the script and run it, so that the output can be used in Firepower as Group Objects. What do you need to get started? Please find a list below:
 
-1. You need the IP address (or domain) of the FMC, the username and password. These are added to the API caller function and obviously also needed for the FMC API explorer. It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during the API calls. 
+1. You need the IP address (or domain) of the FMC, the username and password. These need to be added to the APIcaller function and are obviously also needed for the FMC API explorer. It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during the API calls. 
 
 2. Create 3 Group Objects in FMC: *"O365_XML_URL"* (URL Group Object), *"O365_XML_IPv4"* (Network Group Object) and *"O365_XML_IPv6"* (Network Group Object). At first you will have to put in a random URL/Network, to enable the objects. 
 
@@ -54,11 +54,11 @@ These instructions will enable you to download the script and run it, so that th
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/screenshotAPIexplorer.png)
 
-7. Repeat the GET request of step 4 as well for *"urlgroups"*, to obtain the ID for the URL Group Object (*"O365_XML_URL"*). You should now have 4 ID's copy-pasted, which you can put inside the APIcaller function.
+7. Repeat the GET request of step 4 as well for *"urlgroups"*, to obtain the ID for the URL Group Object (*"O365_XML_URL"*). You should now have 4 ID's copy-pasted, which you can put inside the APIcaller function and in the XMLFeedParser function.
 
 8. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification that uses this certificate.
 
-9. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller script.
+9. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller function (Domain ID and login) and XMLFeedParser function (3 Group Object ID's).
 
 
 ### How to use the Group Objects in Firepower Management Center.
