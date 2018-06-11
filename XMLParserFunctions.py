@@ -111,7 +111,7 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	headers['X-auth-access-token']=auth_token
 
 	# Define API path by using parameters that were passed in function to complete. 
-	domain_ID = "e276abec-e0f2-11e3-8169-6d9ed49b625f"   # INPUT REQUIRED: DOMAIN ID HERE (Tip: you can easily create this path with the FMC API Explorer)
+	domain_ID = "e276abec-e0f2-11e3-8169-6d9ed49b625f"   # INPUT REQUIRED
 	api_path = "/api/fmc_config/v1/domain/" + domain_ID + "/object/" + objectgroup_type + "s/" + object_id    
 	url = server + api_path
 	if (url[-1] == '/'):
