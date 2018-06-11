@@ -46,7 +46,7 @@ These instructions will enable you to download the script and run it, so that th
 
 5. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification.
 
-6. More instructions are in comments in the 2 sample scripts.
+6. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC login, the Domain ID and the Group Object ID's.
 
 
 ### Okay, I have the Group Objects, now what?
