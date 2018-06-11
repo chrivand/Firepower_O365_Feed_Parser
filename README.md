@@ -77,7 +77,7 @@ These objects can be used in either Prefilter Policy Fastpath-rule (for the Netw
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicyrule.png)
 
-With the end result:
+This will result in the following rule:
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicy.png)
 
