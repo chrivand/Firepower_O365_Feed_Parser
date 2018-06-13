@@ -88,8 +88,9 @@ Likewise, this can be done with a Trust Rule in the Access Control Policy for th
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/ACPtrustrule.png)
 
+As a final step you will need to do a Policy Deploy, each time that the Group Objects have been updated. This can be done from the FMC by clicking on *"DEPLOY"* and by selecting the device that need this Policy Deploy.
 
-Please take caution on the following notes:
+### Please take caution on the following notes:
 
 * Please test this properly before implementing in a production environment. This is a sample script.
 
