@@ -22,7 +22,7 @@ import time
 # import supporting functions from additional file
 from XMLParserFunctions import APIcaller, intervalScheduler, md5
 
-# define global variables, CurrentMD5 will be updated every time script refreshes
+# define global variables, CurrentMD5 will be updated every time script refreshes, please manually input MD5 if intervalScheduler is not used
 CurrentMD5 = "NONE"
 XML_URL = 'https://support.content.office.net/en-us/static/O365IPAddresses.xml'
 
@@ -123,7 +123,7 @@ def XMLFeedParser():
 ##############END PARSE FUNCTION##############START EXECUTION SCRIPT##############
 
 try:
-    # comment for executing XMLFeedParser just once
+    # comment for executing XMLFeedParser just once, please copy paste MD5 hash that is outputted in terminal
     XMLFeedParser()
 
     # calls the intervalScheduler for automatic refreshing (pass XMLFeedParser function and interval in seconds (1 hour = 3600 seconds))
