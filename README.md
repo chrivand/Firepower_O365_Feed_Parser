@@ -18,6 +18,9 @@ This is a sample script that parses the XML feed (https://support.content.office
 
 * Email / Webex Teams alert when changes were made to Objects;
 * Automatic policy deploy using API when changes were made to Objects.
+* Update script to use new feed from MSFT (roadmapped by MSFT).
+* Create extra modules for other SaaS applications.
+* Create extra modules for other Cisco solutions (WSA, Umbrella etc.)
 
 
 ## Solution Components
