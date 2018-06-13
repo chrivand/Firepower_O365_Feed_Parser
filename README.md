@@ -20,14 +20,14 @@ Please contact me if you have any questions or remarks.
 
 * Email / Webex Teams alert when changes were made to Objects;
 * Automatic policy deploy using API when changes were made to Objects;
-* Update script to use new feed from MSFT (roadmapped by MSFT);
+* Update script to use new feed from Microsoft (will replace XML feed in future);
 * Create extra modules for other SaaS applications;
 * Create extra modules for other Cisco solutions (WSA, Umbrella etc.).
 
 
 ## Solution Components
 
-The script consists of 2 python files. The main script can run indefinitely, leveraging a function that is built in, to rerun the script every x amount of seconds (it can also just be executed once). Then, using the MD5 hash of the XML file, it is checked if changes were made to the XML file. If changes happened, the XML file is parsed and uploaded using a PUT request to FMC.  
+The script consists of 2 python files. The main script can run indefinitely, leveraging a function that is built in, to rerun the script every x amount of seconds (it can also just be executed once). Then, using the MD5 hash of the XML file, the script checks if changes were made to the XML file. If changes were made, the XML file is parsed and uploaded using a PUT request to FMC.  
 
 ### Cisco Products / Services
 
@@ -63,7 +63,7 @@ These instructions will enable you to download the script and run it, so that th
 
 8. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification that uses this certificate.
 
-9. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller function (Domain ID and login) and XMLFeedParser function (3 Group Object ID's).
+9. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC IP, the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller function (FMC IP, Domain ID and login) and XMLFeedParser function (3 Group Object ID's).
 
 
 ### How to use the Group Objects in Firepower Management Center.
