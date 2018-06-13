@@ -73,12 +73,12 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	server = "https://<INPUT FMC IP HERE>"   # INPUT REQUIRED
 
 	# input FMC username (Tip: create a separate admin account for this function, otherwise user will be logged out during API calls)
-	username = "<INPUT USERNAME HERE"   # INPUT REQUIRED
+	username = "<INPUT USERNAME HERE>"   # INPUT REQUIRED
 	if len(sys.argv) > 1:
 		username = sys.argv[1]
 
 	# input FMC password
-	password = "<INPUT PASSWORD HERE"   # INPUT REQUIRED
+	password = "<INPUT PASSWORD HERE>"   # INPUT REQUIRED
 	if len(sys.argv) > 2:
 		password = sys.argv[2]
 
