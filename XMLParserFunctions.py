@@ -12,6 +12,7 @@
 # IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied.
 
+# import libraries
 import xml.etree.ElementTree as ET
 import requests
 import sys
@@ -65,19 +66,19 @@ def md5(fname):
 # Function to make API calls to FMC
 # Takes multiple parameters to be used for the API call
 def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_list, object_field):
-	# Disable warnings regarding Certs. Caution: please use certs in production for better security
+	# Disable warnings regarding Certs. Caution: please use certs for better security
 	requests.packages.urllib3.disable_warnings()
 
-	# input FMC IP/url
-	server = "https://10.10.10.72"   # INPUT REQUIRED
+	# input FMC management IP
+	server = "https://FMC IP ADDRESS HERE"   # INPUT REQUIRED
 
 	# input FMC username (Tip: create a separate admin account for this function, otherwise user will be logged out during API calls)
-	username = "admin"   # INPUT REQUIRED
+	username = "USERNAME HERE"   # INPUT REQUIRED
 	if len(sys.argv) > 1:
 		username = sys.argv[1]
 
 	# input FMC password
-	password = "Cisco123"   # INPUT REQUIRED
+	password = "PASSWORD HERE"   # INPUT REQUIRED
 	if len(sys.argv) > 2:
 		password = sys.argv[2]
 
@@ -111,7 +112,9 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	headers['X-auth-access-token']=auth_token
 
 	# Define API path by using parameters that were passed in function to complete. 
-	domain_ID = "e276abec-e0f2-11e3-8169-6d9ed49b625f"   # INPUT REQUIRED
+	domain_ID = "DOMAIN ID HERE"   # INPUT REQUIRED
+	
+	# combine different elements for API path
 	api_path = "/api/fmc_config/v1/domain/" + domain_ID + "/object/" + objectgroup_type + "s/" + object_id    
 	url = server + api_path
 	if (url[-1] == '/'):

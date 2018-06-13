@@ -23,7 +23,7 @@ import time
 from XMLParserFunctions import APIcaller, intervalScheduler, md5
 
 # define global variables, CurrentMD5 will be updated every time script refreshes
-CurrentMD5 = ""
+CurrentMD5 = "NONE"
 XML_URL = 'https://support.content.office.net/en-us/static/O365IPAddresses.xml'
 
 
@@ -84,7 +84,7 @@ def XMLFeedParser():
 
         
         # API call for URL list (user feedback is provided from the APIcaller function)
-        object_id_url = "000C2943-1B9D-0ed3-0000-025769805102"   # INPUT REQUIRED
+        object_id_url = "O365_XML_URL OBJECT ID HERE"   # INPUT REQUIRED
         objectgroup_name_url = "O365_XML_URL"
         object_type_url = "Url"
         objectgroup_type_url = "urlgroup"
@@ -93,7 +93,7 @@ def XMLFeedParser():
         APIcaller(object_id_url, objectgroup_name_url, object_type_url, objectgroup_type_url, put_list_url, object_field_url)
 
         # API call for IPv4 list
-        object_id_IPv4 = "000C2943-1B9D-0ed3-0000-025769804555"   # INPUT REQUIRED
+        object_id_IPv4 = "O365_XML_IPv4 OBJECT ID HERE"   # INPUT REQUIRED
         objectgroup_name_IPv4 = "O365_XML_IPv4"
         object_type_IPv4 = "Network"
         objectgroup_type_IPv4 = "networkgroup"
@@ -102,7 +102,7 @@ def XMLFeedParser():
         APIcaller(object_id_IPv4, objectgroup_name_IPv4, object_type_IPv4, objectgroup_type_IPv4, put_list_IPv4, object_field_ipv4)
 
         # API call for IPv6 list
-        object_id_ipv6 = "000C2943-1B9D-0ed3-0000-025769805120"   # INPUT REQUIRED
+        object_id_ipv6 = "O365_XML_IPv6 OBJECT ID HERE"   # INPUT REQUIRED
         objectgroup_name_ipv6 = "O365_XML_IPv6"
         object_type_ipv6 = "Network"
         objectgroup_type_ipv6 = "networkgroup"
@@ -123,11 +123,12 @@ def XMLFeedParser():
 ##############END PARSE FUNCTION##############START EXECUTION SCRIPT##############
 
 try:
-    # uncomment for executing XMLFeedParser just once
-    #XMLFeedParser()
+    # comment for executing XMLFeedParser just once
+    XMLFeedParser()
 
     # calls the intervalScheduler for automatic refreshing (pass XMLFeedParser function and interval in seconds (1 hour = 3600 seconds))
-    intervalScheduler(XMLFeedParser, 300) #set to 5 minutes
+    # ucnomment for automatic refreshing
+    #intervalScheduler(XMLFeedParser, 300) #set to 5 minutes
 
 except (KeyboardInterrupt, SystemExit):
     sys.stdout.write("\n")
