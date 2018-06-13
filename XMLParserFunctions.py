@@ -125,7 +125,7 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	# loop through list and put in right format for API call, all fields come from passed parameters in function
 	for element in put_list:
 		object_dict["type"] = object_type
-		object_dict[object_field] = element # VALUE
+		object_dict[object_field] = element 
 		group_list.append(object_dict.copy())
 
 	# create empty dictionary to finish JSON format
