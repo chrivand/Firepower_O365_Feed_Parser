@@ -1,26 +1,28 @@
 # Firepower O365 Feed Parser
 
-_This is a Sample Script that can parse the O365 XML file and upload it to Firepower Management Center as Group Objects._
+_This is a Sample Script that can parse the O365 XML feed and upload it to Firepower Management Center as Group Objects._
 
 ---
 
 This is a sample script that parses the XML feed (https://support.content.office.net/en-us/static/O365IPAddresses.xml) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g. Office 365). The script will parse the XML file into 3 separate lists and use the FMC API's to upload them into 3 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent  latency issues with the applications. 
 
+Please contact me if you have any questions or remarks.
+
 ## Features
 
 * Parsing O365 XML File into 3 lists;
 * Creating right JSON format for FMC API PUT requests;
-* Uploading this JSON to FMC, overwriting the previous Group Object.
+* Uploading this JSON to FMC, overwriting the previous Group Object;
 * Checking if O365 file was updated, using MD5 hashes (optional);
-* Continuously checking for updates with a specified time interval (optional);
+* Continuously checking for updates with a specified time interval (optional).
 
 ### Potential next steps
 
 * Email / Webex Teams alert when changes were made to Objects;
-* Automatic policy deploy using API when changes were made to Objects.
-* Update script to use new feed from MSFT (roadmapped by MSFT).
-* Create extra modules for other SaaS applications.
-* Create extra modules for other Cisco solutions (WSA, Umbrella etc.)
+* Automatic policy deploy using API when changes were made to Objects;
+* Update script to use new feed from MSFT (roadmapped by MSFT);
+* Create extra modules for other SaaS applications;
+* Create extra modules for other Cisco solutions (WSA, Umbrella etc.).
 
 
 ## Solution Components
@@ -103,4 +105,4 @@ As a final step you will need to do a Policy Deploy, each time that the Group Ob
 
 ## Author(s)
 
-* Christopher van der Made (chrivand@cisco.com)
+* Christopher van der Made (Cisco)
