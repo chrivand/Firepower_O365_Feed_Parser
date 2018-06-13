@@ -4,15 +4,15 @@ _This is a Sample Script that can parse the O365 XML file and upload it to Firep
 
 ---
 
-This is a sample script that parses the XML feed (https://support.content.office.net/en-us/static/O365IPAddresses.xml) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (Office 365). The script will parse the XML file into 3 separate lists and use the FMC API's to upload them to 3 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent  latency issues with the applications. 
+This is a sample script that parses the XML feed (https://support.content.office.net/en-us/static/O365IPAddresses.xml) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g. Office 365). The script will parse the XML file into 3 separate lists and use the FMC API's to upload them into 3 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent  latency issues with the applications. 
 
 ## Features
 
-* Checking if O365 file was updated, using MD5 hashes;
-* Continuously checking for updates with a specified time interval;
 * Parsing O365 XML File into 3 lists;
 * Creating right JSON format for FMC API PUT requests;
 * Uploading this JSON to FMC, overwriting the previous Group Object.
+* Checking if O365 file was updated, using MD5 hashes (optional);
+* Continuously checking for updates with a specified time interval (optional);
 
 ### Potential next steps
 
@@ -25,7 +25,7 @@ This is a sample script that parses the XML feed (https://support.content.office
 
 ## Solution Components
 
-The script consists of 2 python files. The main script can run indefintely, leveraging a function that is built in, to rerun the script every x amount of seconds. Then, using the MD5 hash of the XML file, it is checked if changes were made to the XML file. If changes happened, the XML file is parsed and uploaded using a PUT request to FMC. Important is to use SSL verification and to test the script before running this in a production environment. Also, please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is no API call built in to do a policy redeploy, since this might cause other unfinished policies or objects to be deployed (e.g. if a network administrator is working on a Policy in the GUI). This can be done using the API as well, if preferred. It is also possible to execute the script only once, if preferred.
+The script consists of 2 python files. The main script can run indefinitely, leveraging a function that is built in, to rerun the script every x amount of seconds (it can also just be executed once). Then, using the MD5 hash of the XML file, it is checked if changes were made to the XML file. If changes happened, the XML file is parsed and uploaded using a PUT request to FMC.  
 
 ### Cisco Products / Services
 
@@ -35,7 +35,7 @@ The script consists of 2 python files. The main script can run indefintely, leve
 
 ## Installation
 
-These instructions will enable you to download the script and run it, so that the output can be used in Firepower as Group Objects. What do you need to get started? Please find a list below:
+These instructions will enable you to download the script and run it, so that the output can be used in Firepower as Group Objects. What do you need to get started? Please find a list of tasks below:
 
 1. You need the IP address (or domain) of the FMC, the username and password. These need to be added to the APIcaller function and are obviously also needed for the FMC API explorer. It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during the API calls. 
 
@@ -70,7 +70,7 @@ For better understanding of the packet flow in Firepower Threat Defense, and how
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/packetflowftd.png)
 
-After the succesful PUT requests, the 3 Group Objects will have been updated with the new IP-addresses and URLs. Please find screenshots of the 3 Group Objects, after the API call:
+After the successful PUT requests, the 3 Group Objects will have been updated with the new IP-addresses and URLs. Please find screenshots of the 3 Group Objects, after the API call:
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/urlgroupobject.png)
 
@@ -91,6 +91,10 @@ Likewise, this can be done with a Trust Rule in the Access Control Policy for th
 As a final step you will need to do a Policy Deploy, each time that the Group Objects have been updated. This can be done from the FMC by clicking on *"DEPLOY"* and by selecting the device that need this Policy Deploy.
 
 ### Please take caution on the following notes:
+
+* Please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is no API call built in to do a policy redeploy, since this might cause other unfinished policies or objects to be deployed (e.g. if a network administrator is working on a Policy in the GUI).
+
+* Important is to use SSL verification and to test the script before running this in a production environment.
 
 * Please test this properly before implementing in a production environment. This is a sample script.
 
