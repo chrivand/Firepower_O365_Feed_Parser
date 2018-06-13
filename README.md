@@ -25,7 +25,7 @@ This is a sample script that parses the XML feed (https://support.content.office
 
 ## Solution Components
 
-The script consists of 2 python files. The main script needs to run (indefintely) and a function is built in to rerun the script every x amount of seconds. Then, using the MD5 hash of the XML file, it is checked if changes were made to the XML file. If changes happened, the XML file is parsed and uploaded using a PUT request to FMC. Important is to use SSL verification and to test the script before running this in a production environment. Also, please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is no API call built in to do a policy redeploy, since this might cause other unfinished policies or objects to be deployed (e.g. if a network administrator is working on a Policy in the GUI). This can be done using the API as well, if preferred. 
+The script consists of 2 python files. The main script can run indefintely, leveraging a function that is built in, to rerun the script every x amount of seconds. Then, using the MD5 hash of the XML file, it is checked if changes were made to the XML file. If changes happened, the XML file is parsed and uploaded using a PUT request to FMC. Important is to use SSL verification and to test the script before running this in a production environment. Also, please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is no API call built in to do a policy redeploy, since this might cause other unfinished policies or objects to be deployed (e.g. if a network administrator is working on a Policy in the GUI). This can be done using the API as well, if preferred. It is also possible to execute the script only once, if preferred.
 
 ### Cisco Products / Services
 
@@ -94,7 +94,7 @@ As a final step you will need to do a Policy Deploy, each time that the Group Ob
 
 * Please test this properly before implementing in a production environment. This is a sample script.
 
-* The running script should be hosted in a secure environment! For example: if a malicious actor can place additional IP-addresses or URL's in the list somehow, they will be put in a Firepower trust rule, and might cause the malicious actor to bypass security.
+* In case the intervalScheduler is used: the running script should be hosted in a secure environment! For example: if a malicious actor can place additional IP-addresses or URL's in the list somehow, they will be put in a Firepower trust rule, and might cause the malicious actor to bypass security.
 
 
 ## Author(s)
