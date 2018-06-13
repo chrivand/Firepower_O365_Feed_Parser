@@ -127,7 +127,7 @@ try:
     #XMLFeedParser()
 
     # calls the intervalScheduler for automatic refreshing (pass XMLFeedParser function and interval in seconds (1 hour = 3600 seconds))
-    intervalScheduler(XMLFeedParser, 15) 
+    intervalScheduler(XMLFeedParser, 300) #set to 5 minutes
 
 except (KeyboardInterrupt, SystemExit):
     sys.stdout.write("\n")
