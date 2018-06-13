@@ -22,8 +22,8 @@ import time
 # import supporting functions from additional file
 from XMLParserFunctions import APIcaller, intervalScheduler, md5
 
-# define global variables, CurrentMD5 will be updated every time script refreshes, please manually input MD5 if intervalScheduler is not used
-CurrentMD5 = "NONE"
+# define global variables, CurrentMD5 will be updated every time script refreshes, please manually input copy-pasted MD5 if intervalScheduler is not used
+CurrentMD5 = "NOT SET"
 XML_URL = 'https://support.content.office.net/en-us/static/O365IPAddresses.xml'
 
 
@@ -46,6 +46,13 @@ def XMLFeedParser():
     global CurrentMD5
     NewMD5 = md5(XML_File.name)
     
+    # if the MD5 did not change, the XML file was not updated. 
+    if(CurrentMD5 == NewMD5):
+        # user feed back
+        sys.stdout.write("\n")
+        sys.stdout.write("XML feed has NOT been updated, no API calls needed!\n") 
+        sys.stdout.write("\n")
+
     # if MD5 changed, the XML file was updated, so it will be parsed and API calls will be done to update FMC Group Objects
     if(CurrentMD5 != NewMD5):   
         # user feed back
@@ -84,7 +91,7 @@ def XMLFeedParser():
 
         
         # API call for URL list (user feedback is provided from the APIcaller function)
-        object_id_url = "O365_XML_URL OBJECT ID HERE"   # INPUT REQUIRED
+        object_id_url = "<INPUT O365_XML_URL ID HERE>"   # INPUT REQUIRED
         objectgroup_name_url = "O365_XML_URL"
         object_type_url = "Url"
         objectgroup_type_url = "urlgroup"
@@ -93,7 +100,7 @@ def XMLFeedParser():
         APIcaller(object_id_url, objectgroup_name_url, object_type_url, objectgroup_type_url, put_list_url, object_field_url)
 
         # API call for IPv4 list
-        object_id_IPv4 = "O365_XML_IPv4 OBJECT ID HERE"   # INPUT REQUIRED
+        object_id_IPv4 = "<INPUT O365_XML_IPv4 ID HERE>"   # INPUT REQUIRED
         objectgroup_name_IPv4 = "O365_XML_IPv4"
         object_type_IPv4 = "Network"
         objectgroup_type_IPv4 = "networkgroup"
@@ -102,7 +109,7 @@ def XMLFeedParser():
         APIcaller(object_id_IPv4, objectgroup_name_IPv4, object_type_IPv4, objectgroup_type_IPv4, put_list_IPv4, object_field_ipv4)
 
         # API call for IPv6 list
-        object_id_ipv6 = "O365_XML_IPv6 OBJECT ID HERE"   # INPUT REQUIRED
+        object_id_ipv6 = "<INPUT O365_XML_IPv6 ID HERE>"   # INPUT REQUIRED
         objectgroup_name_ipv6 = "O365_XML_IPv6"
         object_type_ipv6 = "Network"
         objectgroup_type_ipv6 = "networkgroup"
@@ -110,20 +117,13 @@ def XMLFeedParser():
         object_field_ipv6 = "value"
         APIcaller(object_id_ipv6, objectgroup_name_ipv6, object_type_ipv6, objectgroup_type_ipv6, put_list_ipv6, object_field_ipv6)
         
-    # if the MD5 did not change, the XML file was not updated. 
-    if(CurrentMD5 == NewMD5):
-        # user feed back
-        sys.stdout.write("\n")
-        sys.stdout.write("XML feed has NOT been updated, no API calls needed!\n") 
-        sys.stdout.write("\n")
-
     # close file after API calls
     XML_File.close
 
 ##############END PARSE FUNCTION##############START EXECUTION SCRIPT##############
 
 try:
-    # uncomment for executing XMLFeedParser just once, please copy paste MD5 hash that is outputted in terminal
+    # uncomment for executing XMLFeedParser just once, please copy-paste MD5 hash that is outputted in terminal
     #XMLFeedParser()
 
     # calls the intervalScheduler for automatic refreshing (pass XMLFeedParser function and interval in seconds (1 hour = 3600 seconds))

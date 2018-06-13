@@ -70,15 +70,15 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	requests.packages.urllib3.disable_warnings()
 
 	# input FMC management IP
-	server = "https://FMC IP ADDRESS HERE"   # INPUT REQUIRED
+	server = "https://<INPUT FMC IP HERE>"   # INPUT REQUIRED
 
 	# input FMC username (Tip: create a separate admin account for this function, otherwise user will be logged out during API calls)
-	username = "USERNAME HERE"   # INPUT REQUIRED
+	username = "<INPUT USERNAME HERE"   # INPUT REQUIRED
 	if len(sys.argv) > 1:
 		username = sys.argv[1]
 
 	# input FMC password
-	password = "PASSWORD HERE"   # INPUT REQUIRED
+	password = "<INPUT PASSWORD HERE"   # INPUT REQUIRED
 	if len(sys.argv) > 2:
 		password = sys.argv[2]
 
@@ -112,7 +112,7 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	headers['X-auth-access-token']=auth_token
 
 	# Define API path by using parameters that were passed in function to complete. 
-	domain_ID = "DOMAIN ID HERE"   # INPUT REQUIRED
+	domain_ID = "<INPUT DOMAIN ID HERE>"   # INPUT REQUIRED
 	
 	# combine different elements for API path
 	api_path = "/api/fmc_config/v1/domain/" + domain_ID + "/object/" + objectgroup_type + "s/" + object_id    
