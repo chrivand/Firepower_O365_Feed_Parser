@@ -123,12 +123,11 @@ def XMLFeedParser():
 ##############END PARSE FUNCTION##############START EXECUTION SCRIPT##############
 
 try:
-    # comment for executing XMLFeedParser just once, please copy paste MD5 hash that is outputted in terminal
-    XMLFeedParser()
+    # uncomment for executing XMLFeedParser just once, please copy paste MD5 hash that is outputted in terminal
+    #XMLFeedParser()
 
     # calls the intervalScheduler for automatic refreshing (pass XMLFeedParser function and interval in seconds (1 hour = 3600 seconds))
-    # ucnomment for automatic refreshing
-    #intervalScheduler(XMLFeedParser, 300) #set to 5 minutes
+    intervalScheduler(XMLFeedParser, 300) #set to 5 minutes
 
 except (KeyboardInterrupt, SystemExit):
     sys.stdout.write("\n")
