@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# unnecessary to have in github
+O365IPAddresses.xml
+.DS_Store
+
 # Distribution / packaging
 .Python
 build/
