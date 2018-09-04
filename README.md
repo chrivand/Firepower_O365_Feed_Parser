@@ -1,4 +1,4 @@
-# Firepower O365 Feed Parser
+# Firepower O365 Feed Parser (Updated Script with NEW O365 Web Service API)
 
 _This is a Sample Script that can parse the NEW O365 Web Service API and upload it to Firepower Management Center as Group Objects._
 
