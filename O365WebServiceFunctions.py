@@ -1,4 +1,4 @@
-# MODULE FOR SUPPORTING FUNCTIONS FOR XMLParserMainScript
+# MODULE FOR SUPPORTING FUNCTIONS FOR O365WebServiceParser
 
 # Copyright (c) 2018 Cisco and/or its affiliates.
 # This software is licensed to you under the terms of the Cisco Sample
@@ -13,55 +13,44 @@
 # or implied.
 
 # import libraries
-import xml.etree.ElementTree as ET
 import requests
 import sys
-import hashlib
 import json
 import time
 import datetime
 
-# Function that can be used to schedule the XMLParser to refresh at intervals. Caution: this creates an infinite loop.
-# Takes the XMLFeedParser function and the interval as parameters. 
+# Function that can be used to schedule the O365WebServiceParser to refresh at intervals. Caution: this creates an infinite loop.
+# Takes the O365WebServiceParser function and the interval as parameters. 
 def intervalScheduler(function, interval):
-    # configure interval to refresh the XMLFeedParser (in seconds, 3600s = 1h, 86400s = 1d)
+    # configure interval to refresh the O365WebServiceParser (in seconds, 3600s = 1h, 86400s = 1d)
     setInterval = interval
-    XMLFeedParser = function
+    O365WebServiceParser = function
 
     # user feedback
     sys.stdout.write("\n")
-    sys.stdout.write("XML Feed Parser will be refreshed every %d seconds. Please use ctrl-C to exit.\n" %interval)
+    sys.stdout.write("O365 Web Service Parser will be refreshed every %d seconds. Please use ctrl-C to exit.\n" %interval)
     sys.stdout.write("\n")
 
     # interval loop, unless keyboard interrupt
     try:
         while True:
-        	XMLFeedParser()
+        	O365WebServiceParser()
         	# get current time, for user feedback
         	date_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         	sys.stdout.write("\n")
-        	sys.stdout.write("[%s] XMLFeedParser executed by IntervalScheduler, current interval is %d seconds. Please use ctrl-C to exit.\n" % (date_time, interval))
+        	sys.stdout.write("[%s] O365 Web Service Parser executed by IntervalScheduler, current interval is %d seconds. Please use ctrl-C to exit.\n" % (date_time, interval))
         	sys.stdout.write("\n")
-        	# sleep for X amount of seconds and then run again. Caution: this creates an infinite loop to check the XML file for changes
+        	# sleep for X amount of seconds and then run again. Caution: this creates an infinite loop to check the Web Service Feed for changes
         	time.sleep(setInterval)
 
     # handle keyboard interrupt
     except (KeyboardInterrupt, SystemExit):
         sys.stdout.write("\n")
         sys.stdout.write("\n")
-        sys.stdout.write("Exiting... XML Feed Parser will not be automatically refreshed anymore.\n")
+        sys.stdout.write("Exiting... O365 Web Service Parser will not be automatically refreshed anymore.\n")
         sys.stdout.write("\n")
         sys.stdout.flush()
         pass
-
-# Function to calculate the MD5 hash of a file. This can be used to check if the XML file was updateds. 
-# Takes file name as parameter (e.g. the XML file)
-def md5(fname):
-    hash_md5 = hashlib.md5()
-    with open(fname, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
 
 # Function to make API calls to FMC
 # Takes multiple parameters to be used for the API call
@@ -70,15 +59,15 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	requests.packages.urllib3.disable_warnings()
 
 	# input FMC management IP
-	server = "https://<INPUT FMC IP HERE>"   # INPUT REQUIRED
+	server = "https://<INPUT FMC IP HERE>"   ### INPUT REQUIRED ###
 
 	# input FMC username (Tip: create a separate admin account for this function, otherwise user will be logged out during API calls)
-	username = "<INPUT USERNAME HERE>"   # INPUT REQUIRED
+	username = "<INPUT USERNAME HERE>"   ### INPUT REQUIRED ###
 	if len(sys.argv) > 1:
 		username = sys.argv[1]
 
 	# input FMC password
-	password = "<INPUT PASSWORD HERE>"   # INPUT REQUIRED
+	password = "<INPUT PASSWORD HERE>"   ### INPUT REQUIRED ###
 	if len(sys.argv) > 2:
 		password = sys.argv[2]
 
@@ -112,7 +101,7 @@ def APIcaller(object_id, objectgroup_name, object_type, objectgroup_type, put_li
 	headers['X-auth-access-token']=auth_token
 
 	# Define API path by using parameters that were passed in function to complete. 
-	domain_ID = "<INPUT DOMAIN ID HERE>"   # INPUT REQUIRED
+	domain_ID = "<INPUT DOMAIN ID HERE>"   ### INPUT REQUIRED ###
 	
 	# combine different elements for API path
 	api_path = "/api/fmc_config/v1/domain/" + domain_ID + "/object/" + objectgroup_type + "s/" + object_id    
