@@ -64,7 +64,7 @@ These instructions will enable you to download the script and run it, so that th
 
 8. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification that uses this certificate. It has clear instructions commented above the code.
 
-9. More instructions are in comments in the 2 sample scripts. It will say *### INPUT REQUIRED ###* after the variables where you are required to fill in the FMC IP, the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller function (FMC IP, Domain ID and login) and XMLFeedParser function (2 Group Object ID's).
+9. More instructions are in comments in the 2 sample scripts. It will say *### INPUT REQUIRED ###* after the variables where you are required to fill in the FMC IP, the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller function (FMC IP, Domain ID and login) and O365WebServiceParser function (2 Group Object ID's).
 
 
 ### How to use the Group Objects in Firepower Management Center.
@@ -81,15 +81,15 @@ After the successful PUT requests, the 2 Group Objects will have been updated wi
 
 These objects can be used in either Prefilter Policy Fastpath-rule (for the Network Object), or in an Access Control Policy Trust-rule (for the URL Object). This is an example of how to configure the Prefilter Policy rule in FMC:
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicyrule.png)
+![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/addprefilterrule.png)
 
 This will result in the following rule:
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicy.png)
+![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/fastpathrule.png)
 
 Likewise, this can be done with a Trust Rule in the Access Control Policy for the URL Group Object:
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/ACPtrustrule.png)
+![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/trustrule.png)
 
 As a final step you will need to do a Policy Deploy, each time that the Group Objects have been updated. This can be done from the FMC by clicking on *"DEPLOY"* and by selecting the device that need this Policy Deploy.
 
