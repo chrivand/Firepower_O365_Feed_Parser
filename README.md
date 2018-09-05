@@ -71,13 +71,13 @@ These instructions will enable you to download the script and run it, so that th
 
 For better understanding of the packet flow in Firepower Threat Defense, and how the Fastpath action in the Prefilter Policy works, please review the following flow diagram:    
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/screenshots_FMC_O365/packetflowftd.png)
+![Networkobjects](screenshots_FMC_O365/packetflowftd.png)
 
 After the successful PUT requests, the 2 Group Objects will have been updated with the new IP-addresses and URLs. Please find screenshots of the 2 Group Objects, after the API call:
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/screenshots_FMC_O365/screenshot_urlobject_new.png)
+![Networkobjects](screenshots_FMC_O365/screenshot_urlobject_new.png)
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/screenshots_FMC_O365/screenshot_networkobject_new.png)
+![Networkobjects](screenshots_FMC_O365/screenshot_networkobject_new.png)
 
 These objects can be used in either Prefilter Policy Fastpath-rule (for the Network Object), or in an Access Control Policy Trust-rule (for the URL Object). This is an example of how to configure the Prefilter Policy rule in FMC:
 
@@ -85,11 +85,11 @@ These objects can be used in either Prefilter Policy Fastpath-rule (for the Netw
 
 This will result in the following rule:
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/screenshots_FMC_O365/fastpathrule.png)
+![Networkobjects](screenshots_FMC_O365/fastpathrule.png)
 
 Likewise, this can be done with a Trust Rule in the Access Control Policy for the URL Group Object:
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/screenshots_FMC_O365/trustrule.png)
+![Networkobjects](screenshots_FMC_O365/trustrule.png)
 
 As a final step you will need to do a Policy Deploy, each time that the Group Objects have been updated. This can be done from the FMC by clicking on *"DEPLOY"* and by selecting the device that need this Policy Deploy.
 
