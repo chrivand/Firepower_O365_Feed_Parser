@@ -1,19 +1,21 @@
-# Firepower O365 Feed Parser (Updated Script with NEW O365 Web Service API)
+# Firepower O365 Feed Parser 
+# ***Updated Script with NEW O365 Web Service API***
 
 _This is a Sample Script that can parse the NEW O365 Web Service API and upload it to Firepower Management Center as Group Objects._
 
 ---
 
-This is a sample script that parses the NEW O365 Web Service API (https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g. Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API's to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent  latency issues with the applications. 
+This is a sample script that parses the NEW O365 Web Service API (https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g. Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API's to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent latency issues with the Microsoft O365 applications. 
 
-Please contact me if you have any questions or remarks.
+Please contact me if you have any questions or remarks. If you find any bugs, please report them to me, and I will correct them (or do a pull request).
 
 ## Features
 
-* Parsing O365 XML File into 2 lists (URL and IP);
+* Retrieving Wordlwide URLs and IPs from new O365 REST-based web service. 
+* Parsing these into 2 flat lists (URL and IP);
 * Creating right JSON format for FMC API PUT requests;
 * Uploading this JSON to FMC, overwriting the previous Group Object;
-* Checking if O365 file was updated, using the Version API Endpoint;
+* Checking if O365 file was updated, using the O365 Version API Endpoint;
 * Continuously checking for updates with a specified time interval (optional).
 
 ### Potential next steps
@@ -26,7 +28,7 @@ Please contact me if you have any questions or remarks.
 
 ## Solution Components
 
-The script consists of 2 python files. The main script can run indefinitely, leveraging a function that is built in, to rerun the script every x amount of seconds (it can also just be executed once). Then, using the Version API Endpoint, the script checks if changes were made to the Web Service list. If changes were made, the Web Service list is parsed and uploaded using a PUT request to FMC.  
+The script consists of 2 python files. The main script can run indefinitely, leveraging a function that is built in, to rerun the script every x amount of seconds (it can also just be executed once). Then, using the Version API Endpoint, the script checks if changes were made to the Web Service list. If changes were made, the Web Service list is parsed and uploaded using a PUT request to FMC. Microsoft updates the Office 365 IP address and FQDN entries at the end of each month and occasionally out of cycle for operational or support requirements. Therefore, Microsoft recommends you check the version daily, or at the most, hourly. This can be automated with the script.
 
 ### Cisco Products / Services
 
@@ -38,19 +40,19 @@ The script consists of 2 python files. The main script can run indefinitely, lev
 
 These instructions will enable you to download the script and run it, so that the output can be used in Firepower as Group Objects. What do you need to get started? Please find a list of tasks below:
 
-1. You need the IP address (or domain) of the FMC, the username and password. These need to be added to the APIcaller function and are obviously also needed for the FMC API explorer. It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during the API calls. 
+1. You need the IP address (or domain) of the FMC, the username and password. These need to be added to the APIcaller function and are obviously also needed to access the FMC (and FMC API explorer). It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during every API calls. 
 
-2. Create 3 Group Objects in FMC: *"O365_XML_URL"* (URL Group Object), *"O365_XML_IPv4"* (Network Group Object) and *"O365_XML_IPv6"* (Network Group Object). At first you will have to put in a random URL/Network, to enable the objects. 
+2. Create 2 Group Objects in FMC: *"O365_Web_Service_URLs"* (URL Group Object) and *"O365_Web_Service_IPs"* (Network Group Object). At first you will have to put in a random URL/Network, to create the group objects. No worries, we will override this later.
 
 3. In FMC, go to System > Configuration > REST API Preferences to make sure that the REST API is enabled on the FMC.
 
 4. Use the FMC API Explorer to do a GET request for the Group Objects. This is done by going into the FMC API Explorer (can be reached at https://IP-addressOfFMC/api/api-explorer), and then clicking on *"Object"* in the left menu. The scroll down to *"networkgroups"* and click on *"GET"* and then again on *"GET"* in the right menu. 
 
-5. Now you will need to copy-paste the the Object ID's of the 2 Network Group Objects (*"O365_XML_IPv4"* and *"O365_XML_IPv6"*). The ID's will look like the following format: *"000XXXX-YYYY-ZZZZ-0000-01234567890"*. This is displayed in the *"Response Text"* output box in the right menu. You will need these later in the PUT requests to update the objects. Below is an example of how this output would look for the *"O365_XML_IPv4"* Network Group Object:
+5. Now you will need to copy-paste the the Object ID's of the Network Group Object (*"O365_Web_Service_IPs"*). The ID's will look like the following format: *"000XXXX-YYYY-ZZZZ-0000-01234567890"*. This is displayed in the *"Response Text"* output box in the right menu. You will need these later in the PUT requests to update the objects. Below is an example of how this output would look for the *"O365_Web_Service_IPs"* Network Group Object:
 
 ```
 "type": "NetworkGroup",
-"name": "O365_XML_IPv4",
+"name": "O365_Web_Service_IPs",
 "id": "000XXXX-YYYY-ZZZZ-0000-01234567890"
 ```
 
@@ -58,11 +60,11 @@ These instructions will enable you to download the script and run it, so that th
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/screenshotAPIexplorer.png)
 
-7. Repeat the GET request of step 4 as well for *"urlgroups"*, to obtain the ID for the URL Group Object (*"O365_XML_URL"*). You should now have 4 ID's copy-pasted, which you can put inside the APIcaller function and in the XMLFeedParser function.
+7. Repeat the GET request of step 4 as well for *"urlgroups"*, to obtain the ID for the URL Group Object (*"O365_Web_Service_URLs"*). You should now have 3 ID's copy-pasted, which you can put inside the APIcaller function and in the O365WebServiceParser function.
 
-8. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification that uses this certificate.
+8. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification that uses this certificate. It has clear instructions commented above the code.
 
-9. More instructions are in comments in the 2 sample scripts. It will say *# INPUT REQUIRED* after the variables where you are required to fill in the FMC IP, the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller function (FMC IP, Domain ID and login) and XMLFeedParser function (2 Group Object ID's).
+9. More instructions are in comments in the 2 sample scripts. It will say *### INPUT REQUIRED ###* after the variables where you are required to fill in the FMC IP, the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller function (FMC IP, Domain ID and login) and XMLFeedParser function (2 Group Object ID's).
 
 
 ### How to use the Group Objects in Firepower Management Center.
@@ -71,13 +73,13 @@ For better understanding of the packet flow in Firepower Threat Defense, and how
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/packetflowftd.png)
 
-After the successful PUT requests, the 3 Group Objects will have been updated with the new IP-addresses and URLs. Please find screenshots of the 3 Group Objects, after the API call:
+After the successful PUT requests, the 2 Group Objects will have been updated with the new IP-addresses and URLs. Please find screenshots of the 2 Group Objects, after the API call:
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/urlgroupobject.png)
+![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/screenshot_urlobject_new.png)
 
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/networkgroupobjects.png)
+![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/screenshot_networkobject_new.png)
 
-These objects can be used in either Prefilter Policy Fastpath-rule (for the Network Objects), or in an Access Control Policy Trust-rule (for the URL Object). This is an example of how to configure the Prefilter Policy rule in FMC:
+These objects can be used in either Prefilter Policy Fastpath-rule (for the Network Object), or in an Access Control Policy Trust-rule (for the URL Object). This is an example of how to configure the Prefilter Policy rule in FMC:
 
 ![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/prefilterpolicyrule.png)
 
