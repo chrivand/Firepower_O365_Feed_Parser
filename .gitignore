@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 # unnecessary to have in github
-O365IPAddresses.xml
+latestVersion.txt
 .DS_Store
 
 # Distribution / packaging
