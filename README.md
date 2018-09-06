@@ -12,7 +12,7 @@ Please contact me if you have any questions or remarks. If you find any bugs, pl
 ## Features
 
 * Retrieving Wordlwide URLs and IPs from new O365 REST-based web service. 
-* Parsing these into 2 flat lists (URL and IP);
+* Parsing these into 2 flat lists (URL and IP (mixed IPv4 and IPv6));
 * Creating right JSON format for FMC API PUT requests;
 * Uploading this JSON to FMC, overwriting the previous Group Object;
 * Checking if O365 file was updated, using the O365 Version API Endpoint;
