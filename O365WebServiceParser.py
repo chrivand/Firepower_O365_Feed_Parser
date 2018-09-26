@@ -104,39 +104,46 @@ def WebServiceParser():
         # initiate lists to be filled with addresses
         URL_List = []
         IP_List = []
-        URL_List_Flat = []
-        IP_List_Flat = []
 
         # error handling if true then the request was HTTP 200, so successful 
         if(req.status_code == 200):
+            
             # grab output in JSON format
             output = req.json()
 
-            # loop through JSON and put all URLs in list
-            for URL in output:
-                urls = URL['urls'] if 'urls' in URL else []
-                URL_List.append(urls)
-            
-            # loop through JSON and put all IPs in list
-            for IP in output:
-                ips = IP['ips'] if 'ips' in IP else []
-                IP_List.append(ips)
+            # iterate through each 'item' in the JSON data
+            for item in output:
 
-        # take out sub lists to upload to have list in right format to send to FMC
-        for sublist in URL_List:
-            for item in sublist:
-                URL_List_Flat.append(item)
+                # make sure URLs exist in the item
+                if 'urls' in item:
+                    
+                    # iterate through all URLs in each item
+                    for url in item['urls']:
 
-        for sublist in IP_List:
-            for item in sublist:
-                IP_List_Flat.append(item)
+                        # remove asterisks to put URLs into Firepower format 
+                        #   (https://www.cisco.com/c/en/us/support/docs/security/firesight-management-center/118852-technote-firesight-00.html#anc14)
+                        url = url.replace('*','')
+
+                        # if the URL hasn't already been appended, then append it
+                        if url not in URL_List:
+                            URL_List.append(url)
+
+                # make sure IPs exist in the item
+                if 'ips' in item:
+
+                    # iterate through all IPs in each item
+                    for ip in item['ips']:
+
+                        # if the IP hasn't already been appended, then append it
+                        if ip not in IP_List:
+                            IP_List.append(ip)
 
         # API call for URL list (user feedback is provided from the APIcaller function)
         object_id_url = "<INPUT O365_Web_Service_URLs ID HERE>"   ### INPUT REQUIRED ###
         objectgroup_name_url = "O365_Web_Service_URLs"
         object_type_url = "Url"
         objectgroup_type_url = "urlgroup"
-        put_list_url = URL_List_Flat
+        put_list_url = URL_List
         object_field_url = "url"
         APIcaller(object_id_url, objectgroup_name_url, object_type_url, objectgroup_type_url, put_list_url, object_field_url)
 
@@ -145,7 +152,7 @@ def WebServiceParser():
         objectgroup_name_IP = "O365_Web_Service_IPs"
         object_type_IP = "Network"
         objectgroup_type_IP = "networkgroup"
-        put_list_IP = IP_List_Flat
+        put_list_IP = IP_List
         object_field_ip = "value"
         APIcaller(object_id_IP, objectgroup_name_IP, object_type_IP, objectgroup_type_IP, put_list_IP, object_field_ip)
 
