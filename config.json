@@ -1,0 +1,12 @@
+{
+    "FMC_IP": "",
+    "FMC_USER": "",
+    "FMC_PASS": "",
+    "IP_UUID": "",
+    "URL_UUID": "",
+    "SERVICE": false,
+    "SSL_VERIFY": false,
+    "SSL_CERT": "/path/to/certificate",
+    "AUTO_DEPLOY": false,
+    "VERSION": 0
+}

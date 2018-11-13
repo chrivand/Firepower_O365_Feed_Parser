@@ -1,8 +1,6 @@
 # Firepower O365 Feed Parser 
 # ***Updated Script with NEW O365 Web Service API***
 
-test
-
 _This is a Sample Script that can parse the NEW O365 Web Service API and upload it to Firepower Management Center as Group Objects._
 
 ---
@@ -17,20 +15,21 @@ Please contact me if you have any questions or remarks. If you find any bugs, pl
 * Parsing these into 2 flat lists (URL and IP (mixed IPv4 and IPv6));
 * Creating right JSON format for FMC API PUT requests;
 * Uploading this JSON to FMC, overwriting the previous Group Object;
+* If no objects have been created, 2 overridable objects will be created: 'O365_Web_Service_IPs' and 'O365_Web_Service_URLs';
 * Checking if O365 file was updated, using the O365 Version API Endpoint;
+* Automatic policy deploy using API when changes were made to Objects (optional, caution this will also deploy other, unrelated policy changes);
 * Continuously checking for updates with a specified time interval (optional).
 
 ### Potential next steps
 
 * Email / Webex Teams alert when changes were made to Objects;
-* Automatic policy deploy using API when changes were made to Objects;
 * Create extra modules for other SaaS applications;
 * Create extra modules for other Cisco solutions (WSA, Umbrella etc.).
 
 
 ## Solution Components
 
-The script consists of 2 python files. The main script can run indefinitely, leveraging a function that is built in, to rerun the script every x amount of seconds (it can also just be executed once). Then, using the Version API Endpoint, the script checks if changes were made to the Web Service list. If changes were made, the Web Service list is parsed and uploaded using a PUT request to FMC. Microsoft updates the Office 365 IP address and FQDN entries at the end of each month and occasionally out of cycle for operational or support requirements. Therefore, Microsoft recommends you check the version daily, or at the most, hourly. This can be automated with the script.
+The script consists of 3 python files. The main script can run indefinitely, leveraging a function that is built in, to rerun the script every x amount of seconds (it can also just be executed once). Then, using the Version API Endpoint, the script checks if changes were made to the Web Service list. If changes were made, the Web Service list is parsed and uploaded using a PUT request to FMC. Microsoft updates the Office 365 IP address and FQDN entries at the end of each month and occasionally out of cycle for operational or support requirements. Therefore, Microsoft recommends you check the version daily, or at the most, hourly. This can be automated with the script.
 
 ### Cisco Products / Services
 
@@ -42,15 +41,21 @@ The script consists of 2 python files. The main script can run indefinitely, lev
 
 These instructions will enable you to download the script and run it, so that the output can be used in Firepower as Group Objects. What do you need to get started? Please find a list of tasks below:
 
-1. You need the IP address (or domain) of the FMC, the username and password. These need to be added to the APIcaller function and are obviously also needed to access the FMC (and FMC API explorer). It is recommended to create a separate FMC login account for the API usage, otherwise the admin will be logged out during every API calls. 
+1. You need the IP address (or domain name) of the FMC, the username and password. These will be requested by the script the first time it is run. It is recommended to create a separate FMC login account for API usage, otherwise the admin will be logged out during every API calls. 
 
-2. Create 2 Group Objects in FMC: *"O365_Web_Service_URLs"* (URL Group Object) and *"O365_Web_Service_IPs"* (Network Group Object). At first you will have to put in a random URL/Network, to create the group objects. No worries, we will override this later.
+2. In the FMC, go to System > Configuration > REST API Preferences to make sure that the REST API is enabled on the FMC.
 
-3. In FMC, go to System > Configuration > REST API Preferences to make sure that the REST API is enabled on the FMC.
+3. A Network Group object and a URL Group object will be created automatically during the first run of the script. However, if you'd rather create the objects manually, you can follow the instructions below.
 
-4. Use the FMC API Explorer to do a GET request for the Group Objects. This is done by going into the FMC API Explorer (can be reached at https://IP-addressOfFMC/api/api-explorer), and then clicking on *"Object"* in the left menu. The scroll down to *"networkgroups"* and click on *"GET"* and then again on *"GET"* in the right menu. 
+4. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the config.json file, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
 
-5. Now you will need to copy-paste the the Object ID's of the Network Group Object (*"O365_Web_Service_IPs"*). The ID's will look like the following format: *"000XXXX-YYYY-ZZZZ-0000-01234567890"*. This is displayed in the *"Response Text"* output box in the right menu. You will need these later in the PUT requests to update the objects. Below is an example of how this output would look for the *"O365_Web_Service_IPs"* Network Group Object:
+### Manual Object Creation (Optional)
+
+1. Create 2 Group Objects in FMC: "O365_Web_Service_URLs" (URL Group Object) and "O365_Web_Service_IPs" (Network Group Object). At first you will have to put in a random URL/Network, to create the group objects. No worries, we will override this later.
+
+2. Use the FMC API Explorer to do a GET request for the Network Group Objects. This is done by going into the FMC API Explorer (can be reached at https://IP-addressOfFMC/api/api-explorer), and then clicking on *"Object"* in the left menu. The scroll down to *"networkgroups"* and click on *"GET"* and then again on *"GET"* in the right menu. 
+
+3. Now you will need to copy-paste the the Object ID's of the Network Group Object (*"O365_Web_Service_IPs"*). The ID's will look like the following format: *"000XXXX-YYYY-ZZZZ-0000-01234567890"*. This is displayed in the *"Response Text"* output box in the right menu. You will need these later in the PUT requests to update the objects. Below is an example of how this output would look for the *"O365_Web_Service_IPs"* Network Group Object:
 
 ```
 "type": "NetworkGroup",
@@ -58,16 +63,7 @@ These instructions will enable you to download the script and run it, so that th
 "id": "000XXXX-YYYY-ZZZZ-0000-01234567890"
 ```
 
-6. You will also need the ID for the FMC Domain, to include in the API path. This can also be obtained from the FMC API explorer. When clicking on GET when doing to request above, the ID of the domain is showed in the path and has the same syntax as the Object ID's: 
-
-![Networkobjects](https://github.com/chrivand/Firepower_O365_Feed_Parser/blob/master/screenshots_FMC_O365/screenshotAPIexplorer.png)
-
-7. Repeat the GET request of step 4 as well for *"urlgroups"*, to obtain the ID for the URL Group Object (*"O365_Web_Service_URLs"*). You should now have 3 ID's copy-pasted, which you can put inside the APIcaller function and in the O365WebServiceParser function.
-
-8. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the APIcaller function, there is an option to enable SSL verification that uses this certificate. It has clear instructions commented above the code.
-
-9. More instructions are in comments in the 2 sample scripts. It will say *### INPUT REQUIRED ###* after the variables where you are required to fill in the FMC IP, the FMC login, the Domain ID and the Group Object ID's. All of these fields are in the APIcaller function (FMC IP, Domain ID and login) and O365WebServiceParser function (2 Group Object ID's).
-
+4. Repeat the GET request of step 4 as well for *"urlgroups"*, to obtain the ID for the URL Group Object (*"O365_Web_Service_URLs"*). You should now have two ID's copy-pasted, which you can put inside the *config.json* file as *"IP_UUID"* and *"URL_UUID"* to configure the script.
 
 ### How to use the Group Objects in Firepower Management Center.
 
@@ -97,9 +93,9 @@ As a final step you will need to do a Policy Deploy, each time that the Group Ob
 
 ### Please take caution on the following notes:
 
-* Please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is no API call built in to do a policy redeploy, since this might cause other unfinished policies or objects to be deployed (e.g. if a network administrator is working on a Policy in the GUI).
+* Please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is an optional API call built in to do a policy redeploy, however please take caution in using this, since this might cause other, unrelated policies or objects to be deployed (e.g. if another network administrator is working on a Policy in the GUI).
 
-* Important is to use SSL verification and to test the script before running this in a production environment.
+* Important is to use SSL verification and to test the script before running this in a production environment. In the config.json file, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
 
 * Please test this properly before implementing in a production environment. This is a sample script.
 
@@ -109,3 +105,4 @@ As a final step you will need to do a Policy Deploy, each time that the Group Ob
 ## Author(s)
 
 * Christopher van der Made (Cisco)
+* Alan Nix (Cisco)
