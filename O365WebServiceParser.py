@@ -17,11 +17,12 @@ import json
 import os
 import requests
 import sys
+import datetime
 import time
 import uuid
 # import supporting functions from additional file
 from Firepower import Firepower
-from O365WebServiceFunctions import intervalScheduler
+# from O365WebServiceFunctions import intervalScheduler # migrated function to this file, other python file (O365WebServiceFunctions) redundant 
 
 # Config Paramters
 CONFIG_FILE     = "config.json"
@@ -126,6 +127,37 @@ def DeployPolicies(fmc):
     else:
 
         sys.stdout.write("There were zero pending deployments.\n")
+
+# Function that can be used to schedule the O365WebServiceParser to refresh at intervals. Caution: this creates an infinite loop.
+# Takes the O365WebServiceParser function and the interval as parameters. 
+def intervalScheduler(function, interval):
+
+    # user feedback
+    sys.stdout.write("\n")
+    sys.stdout.write("O365 Web Service Parser will be refreshed every %d seconds. Please use ctrl-C to exit.\n" %interval)
+    sys.stdout.write("\n")
+
+    # interval loop, unless keyboard interrupt
+    try:
+        while True:
+            function()
+            # get current time, for user feedback
+            date_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            sys.stdout.write("\n")
+            sys.stdout.write("[%s] O365 Web Service Parser executed by IntervalScheduler, current interval is %d seconds. Please use ctrl-C to exit.\n" % (date_time, interval))
+            sys.stdout.write("\n")
+            # sleep for X amount of seconds and then run again. Caution: this creates an infinite loop to check the Web Service Feed for changes
+            time.sleep(interval)
+
+    # handle keyboard interrupt
+    except (KeyboardInterrupt, SystemExit):
+        sys.stdout.write("\n")
+        sys.stdout.write("\n")
+        sys.stdout.write("Exiting... O365 Web Service Parser will not be automatically refreshed anymore.\n")
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+        pass
+
 
 # function to parse the Web Service, so that it can be called iteratively (e.g by the scheduler function)
 def WebServiceParser():

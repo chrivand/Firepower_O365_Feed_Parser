@@ -17,6 +17,8 @@ import datetime
 import sys
 import time
 
+# NOTE migrated this function to other main file (O365WebServiceParser), this python file redundant 
+
 # Function that can be used to schedule the O365WebServiceParser to refresh at intervals. Caution: this creates an infinite loop.
 # Takes the O365WebServiceParser function and the interval as parameters. 
 def intervalScheduler(function, interval):
