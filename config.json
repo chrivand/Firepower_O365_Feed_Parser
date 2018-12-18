@@ -8,5 +8,7 @@
     "SSL_VERIFY": false,
     "SSL_CERT": "/path/to/certificate",
     "AUTO_DEPLOY": false,
-    "VERSION": 0
+    "VERSION": 0,
+    "WEBEX_ACCESS_TOKEN": "",
+    "WEBEX_ROOM_ID": ""
 }

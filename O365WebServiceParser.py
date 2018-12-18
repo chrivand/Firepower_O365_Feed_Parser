@@ -20,9 +20,9 @@ import sys
 import datetime
 import time
 import uuid
+import ciscosparkapi
 # import supporting functions from additional file
 from Firepower import Firepower
-# from O365WebServiceFunctions import intervalScheduler # migrated function to this file, other python file (O365WebServiceFunctions) redundant 
 
 # Config Paramters
 CONFIG_FILE     = "config.json"
@@ -319,8 +319,18 @@ def WebServiceParser():
 
         # user feed back
         sys.stdout.write("\n")
-        sys.stdout.write("Web Service List has been successfully updated!\n") 
+        sys.stdout.write("Web Service List has been successfully updated!\n")
         sys.stdout.write("\n")
+
+        # if Webex Teams tokens set, then send message to Webex room
+        if CONFIG_DATA['WEBEX_ACCESS_TOKEN'] is '' or CONFIG_DATA['WEBEX_ROOM_ID'] is '':
+            # user feed back
+            sys.stdout.write("Webex Teams not set.\n")
+            sys.stdout.write("\n")
+            pass
+        else:    
+            webex = ciscosparkapi.CiscoSparkAPI(CONFIG_DATA['WEBEX_ACCESS_TOKEN'])
+            message = webex.messages.create(CONFIG_DATA['WEBEX_ROOM_ID'],text="Web Service List has been successfully updated! FMC Policy Deploy might be required.") 
 
         saveConfig()
 
