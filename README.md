@@ -18,11 +18,11 @@ Please contact me if you have any questions or remarks. If you find any bugs, pl
 * If no objects have been created, 2 overridable objects will be created: 'O365_Web_Service_IPs' and 'O365_Web_Service_URLs';
 * Checking if O365 file was updated, using the O365 Version API Endpoint;
 * Automatic policy deploy using API when changes were made to Objects (optional, caution this will also deploy other, unrelated policy changes);
+* Webex Teams alert when changes were made to Objects;
 * Continuously checking for updates with a specified time interval (optional).
 
 ### Potential next steps
 
-* Email / Webex Teams alert when changes were made to Objects;
 * Create extra modules for other SaaS applications;
 * Create extra modules for other Cisco solutions (WSA, Umbrella etc.).
 
@@ -48,6 +48,10 @@ These instructions will enable you to download the script and run it, so that th
 3. A Network Group object and a URL Group object will be created automatically during the first run of the script. However, if you'd rather create the objects manually, you can follow the instructions below.
 
 4. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the config.json file, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
+
+5. It is possible to integrate the script with Webex Teams. In order to do that, an API Access Token and a Room ID needs to be filled in in the **config.json** file. Please retrieve your key from: https://developer.webex.com/docs/api/getting-started. The create a dedicated Webex Teams space for these notifications and retrieve the Room ID from: https://developer.webex.com/docs/api/v1/rooms/list-rooms. 
+
+6. In this same Webex Teams room you can subscribe to a RSS feed from Microsoft regarding updates. Use this bot to integrate the RSS feed into your Webex space: https://apphub.webex.com/bots/rss-2739. The RSS feed URL can be found on the Microsoft website (link on top of this page).
 
 ### Manual Object Creation (Optional)
 
