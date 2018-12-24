@@ -69,6 +69,8 @@ def loadConfig():
             "SSL_CERT": "/path/to/certificate",
             "AUTO_DEPLOY": False,
             "VERSION":  0,
+            "WEBEX_ACCESS_TOKEN": "",
+            "WEBEX_ROOM_ID": "",
         }
 
 # A function to store CONFIG_DATA to file
@@ -322,21 +324,31 @@ def WebServiceParser():
         sys.stdout.write("Web Service List has been successfully updated!\n")
         sys.stdout.write("\n")
 
-        # if Webex Teams tokens set, then send message to Webex room
-        if CONFIG_DATA['WEBEX_ACCESS_TOKEN'] is '' or CONFIG_DATA['WEBEX_ROOM_ID'] is '':
-            # user feed back
-            sys.stdout.write("Webex Teams not set.\n")
-            sys.stdout.write("\n")
-            pass
-        else:    
-            webex = ciscosparkapi.CiscoSparkAPI(CONFIG_DATA['WEBEX_ACCESS_TOKEN'])
-            message = webex.messages.create(CONFIG_DATA['WEBEX_ROOM_ID'],text="Web Service List has been successfully updated! FMC Policy Deploy might be required.") 
-
         saveConfig()
 
         # If the user wants us to deploy policies, then do it
         if CONFIG_DATA['AUTO_DEPLOY']:
             DeployPolicies(fmc)
+        
+        # if Webex Teams tokens set, then send message to Webex room
+        if CONFIG_DATA['WEBEX_ACCESS_TOKEN'] is '' or CONFIG_DATA['WEBEX_ROOM_ID'] is '':
+
+            # user feed back
+            sys.stdout.write("Webex Teams not set.\n")
+            sys.stdout.write("\n")
+        else:
+
+            # adjust the Webex message based on the config
+            if CONFIG_DATA['AUTO_DEPLOY']:
+                message_text = "Microsoft Office 365 objects have been successfully updated!  Firepower policy deployment was initiated..."
+            else:
+                message_text = "Microsoft Office 365 objects have been successfully updated!  Firepower policy deployment is required."
+
+            # instantiate the Webex handler with the access token
+            webex = ciscosparkapi.CiscoSparkAPI(CONFIG_DATA['WEBEX_ACCESS_TOKEN'])
+
+            # post a message to the specified Webex room
+            message = webex.messages.create(CONFIG_DATA['WEBEX_ROOM_ID'], text=message_text)
 
 ##############END PARSE FUNCTION##############START EXECUTION SCRIPT##############
 
