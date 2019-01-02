@@ -5,13 +5,13 @@ _This is a Sample Script that can parse the NEW O365 Web Service API and upload 
 
 ---
 
-This is a sample script that parses the NEW O365 Web Service API (https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g. Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API's to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent latency issues with the Microsoft O365 applications. 
+This is a sample script that parses the [NEW O365 Web Service API](https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g., Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent latency issues with the Microsoft O365 applications. 
 
-Please contact me if you have any questions or remarks. If you find any bugs, please report them to me, and I will correct them (or do a pull request).
+Please contact me, Christopher Van Der Made <chrivand@cisco.com>, if you have any questions or remarks. If you find any bugs, please report them to me, and I will correct them (or do a pull request).
 
 ## Features
 
-* Retrieving Wordlwide URLs and IPs from new O365 REST-based web service. 
+* Retrieving Wordlwide URLs and IPs from new O365 REST-based web service; 
 * Parsing these into 2 flat lists (URL and IP (mixed IPv4 and IPv6));
 * Creating right JSON format for FMC API PUT requests;
 * Uploading this JSON to FMC, overwriting the previous Group Object;
@@ -24,7 +24,7 @@ Please contact me if you have any questions or remarks. If you find any bugs, pl
 ### Potential next steps
 
 * Create extra modules for other SaaS applications;
-* Create extra modules for other Cisco solutions (WSA, Umbrella etc.).
+* Create extra modules for other Cisco solutions (WSA, Umbrella, etc.).
 
 
 ## Solution Components
@@ -47,19 +47,19 @@ These instructions will enable you to download the script and run it, so that th
 
 3. A Network Group object and a URL Group object will be created automatically during the first run of the script. However, if you'd rather create the objects manually, you can follow the instructions below.
 
-4. It is also recommended to download a SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the config.json file, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
+4. It is also recommended to download an SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the config.json file, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
 
-5. It is possible to integrate the script with Webex Teams. In order to do that, an API Access Token and a Room ID needs to be filled in in the **config.json** file. Please retrieve your key from: https://developer.webex.com/docs/api/getting-started. The create a dedicated Webex Teams space for these notifications and retrieve the Room ID from: https://developer.webex.com/docs/api/v1/rooms/list-rooms. 
+5. It is possible to integrate the script with Webex Teams. In order to do that, an API Access Token and a Room ID needs to be entered in the **config.json** file. Please retrieve your key from: https://developer.webex.com/docs/api/getting-started. Then create a dedicated Webex Teams space for these notifications and retrieve the Room ID from: https://developer.webex.com/docs/api/v1/rooms/list-rooms. 
 
-6. In this same Webex Teams room you can subscribe to a RSS feed from Microsoft regarding updates. Use this bot to integrate the RSS feed into your Webex space: https://apphub.webex.com/bots/rss-2739. The RSS feed URL can be found on the Microsoft website (link on top of this page).
+6. In this same Webex Teams room you can subscribe to an RSS feed from Microsoft regarding updates. Use this bot to integrate the RSS feed into your Webex space: https://apphub.webex.com/bots/rss-2739. The RSS feed URL can be found on the Microsoft website (link on top of this page).
 
 ### Manual Object Creation (Optional)
 
-1. Create 2 Group Objects in FMC: "O365_Web_Service_URLs" (URL Group Object) and "O365_Web_Service_IPs" (Network Group Object). At first you will have to put in a random URL/Network, to create the group objects. No worries, we will override this later.
+1. Create 2 Group Objects in FMC: "O365_Web_Service_URLs" (URL Group Object) and "O365_Web_Service_IPs" (Network Group Object). At first you will have to put in a random URL/Network to create the group objects. No worries, we will override this later.
 
 2. Use the FMC API Explorer to do a GET request for the Network Group Objects. This is done by going into the FMC API Explorer (can be reached at https://IP-addressOfFMC/api/api-explorer), and then clicking on *"Object"* in the left menu. The scroll down to *"networkgroups"* and click on *"GET"* and then again on *"GET"* in the right menu. 
 
-3. Now you will need to copy-paste the the Object ID's of the Network Group Object (*"O365_Web_Service_IPs"*). The ID's will look like the following format: *"000XXXX-YYYY-ZZZZ-0000-01234567890"*. This is displayed in the *"Response Text"* output box in the right menu. You will need these later in the PUT requests to update the objects. Below is an example of how this output would look for the *"O365_Web_Service_IPs"* Network Group Object:
+3. Now you will need to copy-paste the Object IDs of the Network Group Object (*"O365_Web_Service_IPs"*). The IDs will look like the following format: *"000XXXX-YYYY-ZZZZ-0000-01234567890"*. This is displayed in the *"Response Text"* output box in the right menu. You will need these later in the PUT requests to update the objects. Below is an example of how this output would look for the *"O365_Web_Service_IPs"* Network Group Object:
 
 ```
 "type": "NetworkGroup",
@@ -67,7 +67,7 @@ These instructions will enable you to download the script and run it, so that th
 "id": "000XXXX-YYYY-ZZZZ-0000-01234567890"
 ```
 
-4. Repeat the GET request of step 4 as well for *"urlgroups"*, to obtain the ID for the URL Group Object (*"O365_Web_Service_URLs"*). You should now have two ID's copy-pasted, which you can put inside the *config.json* file as *"IP_UUID"* and *"URL_UUID"* to configure the script.
+4. Repeat the GET request of step 2 as well for *"urlgroups"*, to obtain the ID for the URL Group Object (*"O365_Web_Service_URLs"*). You should now have two IDs copy-pasted, which you can put inside the *config.json* file as *"IP_UUID"* and *"URL_UUID"* to configure the script.
 
 ### How to use the Group Objects in Firepower Management Center.
 
@@ -97,7 +97,7 @@ As a final step you will need to do a Policy Deploy, each time that the Group Ob
 
 ### Please take caution on the following notes:
 
-* Please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is an optional API call built in to do a policy redeploy, however please take caution in using this, since this might cause other, unrelated policies or objects to be deployed (e.g. if another network administrator is working on a Policy in the GUI).
+* Please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is an optional API call built in to do a policy redeploy, however please take caution in using this, since this might cause other, unrelated policies or objects to be deployed (e.g., if another network administrator is working on a Policy in the GUI).
 
 * Important is to use SSL verification and to test the script before running this in a production environment. In the config.json file, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
 
