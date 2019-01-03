@@ -1,5 +1,4 @@
-# Firepower O365 Feed Parser: 
-## O365 Web Service API to Firepower Objects Parser 
+# O365 Web Service API to Firepower Objects Parser 
 
 This is a sample script that parses the [NEW O365 Web Service API](https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g., Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent latency issues with the Microsoft O365 applications. 
 
@@ -106,3 +105,6 @@ As a final step you will need to do a Policy Deploy, each time that the Group Ob
 
 * Christopher van der Made (Cisco)
 * Alan Nix (Cisco)
+
+[![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/chrivand/Firepower_O365_Feed_Parser)
+
