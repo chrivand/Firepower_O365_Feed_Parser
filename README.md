@@ -1,5 +1,4 @@
-# Firepower O365 Feed Parser 
-# ***Updated Script with NEW O365 Web Service API***
+# Firepower O365 Feed Parser: Web Service API to Firepower Objects Parser 
 
 ---
 
