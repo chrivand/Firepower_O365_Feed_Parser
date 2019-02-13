@@ -44,7 +44,7 @@ These instructions will enable you to download the script and run it, so that th
 
 3. A Network Group object and a URL Group object will be created automatically during the first run of the script. However, if you'd rather create the objects manually, you can follow the instructions below.
 
-4. It is also recommended to download an SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the config.json file, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
+4. It is also recommended to download an SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the **config.json file**, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
 
 5. It is possible to integrate the script with Webex Teams. In order to do that, an API Access Token and a Room ID needs to be entered in the **config.json** file. Please retrieve your key from: https://developer.webex.com/docs/api/getting-started. Then create a dedicated Webex Teams space for these notifications and retrieve the Room ID from: https://developer.webex.com/docs/api/v1/rooms/list-rooms. 
 
@@ -61,6 +61,14 @@ pip install -r requirements.txt
 ```
 python3.6 O365WebServiceParser.py
 ```
+
+9. Optionally you can let this script run periodically, by setting *"SERVICE"* to *true* in the **config.json** file. In line 374 of the **O365WebServiceParser.py** the time-period is set, per default it is set to an hour (Microsoft recommends you check the version daily, or at the most, hourly):
+
+```
+intervalScheduler(WebServiceParser, 3600) #set to 1 hour
+```
+
+10. Finally, if you want to automatically deploy the policies, you can set *"AUTO_DEPLOY"* to *true* in the **config.json** file. **Be very careful with this, as unfinished policies might be deployed by doing so.**
 
 ### Manual Object Creation (Optional)
 
