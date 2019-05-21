@@ -20,7 +20,9 @@ import sys
 import datetime
 import time
 import uuid
-import ciscosparkapi
+#import ciscosparkapi
+import webexteamssdk
+
 # import supporting functions from additional file
 from Firepower import Firepower
 
@@ -64,6 +66,8 @@ def loadConfig():
             "FMC_PASS": "",
             "IP_UUID": "",
             "URL_UUID": "",
+            "SERVICE_AREAS": "",
+            "O365_PLAN": "",
             "SERVICE":  False,
             "SSL_VERIFY": False,
             "SSL_CERT": "/path/to/certificate",
@@ -136,7 +140,7 @@ def intervalScheduler(function, interval):
 
     # user feedback
     sys.stdout.write("\n")
-    sys.stdout.write("O365 Web Service Parser will be refreshed every %d seconds. Please use ctrl-C to exit.\n" %interval)
+    sys.stdout.write(f"O365 Web Service Parser will be refreshed every {interval} seconds. Please use ctrl-C to exit.\n")
     sys.stdout.write("\n")
 
     # interval loop, unless keyboard interrupt
@@ -146,7 +150,7 @@ def intervalScheduler(function, interval):
             # get current time, for user feedback
             date_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             sys.stdout.write("\n")
-            sys.stdout.write("[%s] O365 Web Service Parser executed by IntervalScheduler, current interval is %d seconds. Please use ctrl-C to exit.\n" % (date_time, interval))
+            sys.stdout.write(f"{date_time} O365 Web Service Parser executed by IntervalScheduler, current interval is {interval} seconds. Please use ctrl-C to exit.\n")
             sys.stdout.write("\n")
             # sleep for X amount of seconds and then run again. Caution: this creates an infinite loop to check the Web Service Feed for changes
             time.sleep(interval)
@@ -170,9 +174,11 @@ def WebServiceParser():
     # If there's no defined Network Object, make one, then store the UUID - else, get the current object
     if CONFIG_DATA['IP_UUID'] is '':
 
+
+
         # Create the JSON to submit
         object_json = {
-            'name': OBJECT_PREFIX + 'O365_Web_Service_IPs',
+            'name': OBJECT_PREFIX + "O365_IPs_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
             'type': 'NetworkGroup',
             'overridable': True,
         }
@@ -192,7 +198,7 @@ def WebServiceParser():
 
         # Create the JSON to submit
         object_json = {
-            'name': OBJECT_PREFIX + 'O365_Web_Service_URLs',
+            'name': OBJECT_PREFIX + "O365_URLs_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
             'type': 'UrlGroup',
             'overridable': True,
         }
@@ -227,7 +233,7 @@ def WebServiceParser():
 
     # loop through version list and grab Wordwide list version
     for element in version:
-        if(element['instance'] == 'Worldwide'):
+        if(element['instance'] == CONFIG_DATA['O365_PLAN']):  #TODO
             newVersion = int(element['latest'])
 
     # if the version did not change, the Web Service feed was not updated. 
@@ -246,16 +252,23 @@ def WebServiceParser():
 
         # user feedback
         sys.stdout.write("\n")
-        sys.stdout.write("New version of Office 365 worldwide commercial service instance endpoints detected: %(version)s" % {'version': CONFIG_DATA['VERSION']})
+        sys.stdout.write(f"New version of Office 365 {CONFIG_DATA['O365_PLAN']} commercial service instance endpoints detected: {CONFIG_DATA['VERSION']}")
         sys.stdout.write("\n")
 
         ### PARSE JSON FEED ###
 
         # URL needed for the worldwide web service feed
-        webServiceURL = "https://endpoints.office.com/endpoints/worldwide?clientrequestid="
+        #webServiceURL = "https://endpoints.office.com/endpoints/worldwide?clientrequestid="
+
+        # create URL for requesting IP's and URL's
+        if CONFIG_DATA['SERVICE_AREAS'] == 'All':
+            web_service_url = f"https://endpoints.office.com/endpoints/{CONFIG_DATA['O365_PLAN']}?clientrequestid="
+        else:
+            web_service_url = f"https://endpoints.office.com/endpoints/{CONFIG_DATA['O365_PLAN']}?ServiceAreas={CONFIG_DATA['SERVICE_AREAS']}&clientrequestid="
+            
 
         # assemble URL for get request
-        getURL = webServiceURL + clientRequestId
+        getURL = web_service_url + clientRequestId
 
         # do GET request 
         req = requests.get(getURL)  
@@ -274,7 +287,7 @@ def WebServiceParser():
             for item in output:
 
                 # make sure URLs exist in the item
-                if 'urls' in item:
+                if 'urls' in item and item['category'] != 'Default':
                     
                     # iterate through all URLs in each item
                     for url in item['urls']:
@@ -288,7 +301,7 @@ def WebServiceParser():
                             URL_List.append(url)
 
                 # make sure IPs exist in the item
-                if 'ips' in item:
+                if 'ips' in item and item['category'] != 'Default':
 
                     # iterate through all IPs in each item
                     for ip in item['ips']:
@@ -321,7 +334,7 @@ def WebServiceParser():
 
         # user feed back
         sys.stdout.write("\n")
-        sys.stdout.write("Web Service List has been successfully updated!\n")
+        sys.stdout.write(f"Web Service List has been successfully updated for the {CONFIG_DATA['O365_PLAN']} plan and {CONFIG_DATA['SERVICE_AREAS']} apps!\n")
         sys.stdout.write("\n")
 
         saveConfig()
@@ -340,15 +353,17 @@ def WebServiceParser():
 
             # adjust the Webex message based on the config
             if CONFIG_DATA['AUTO_DEPLOY']:
-                message_text = "Microsoft Office 365 objects have been successfully updated!  Firepower policy deployment was initiated..."
+                message_text = f"Microsoft Office 365 objects have been successfully updated for the {CONFIG_DATA['O365_PLAN']} plan and {CONFIG_DATA['SERVICE_AREAS']} apps! Firepower policy deployment was initiated..."
             else:
-                message_text = "Microsoft Office 365 objects have been successfully updated!  Firepower policy deployment is required."
+                message_text = f"Microsoft Office 365 objects have been successfully updated for the {CONFIG_DATA['O365_PLAN']} plan and {CONFIG_DATA['SERVICE_AREAS']} apps! Firepower policy deployment is required."
 
             # instantiate the Webex handler with the access token
-            webex = ciscosparkapi.CiscoSparkAPI(CONFIG_DATA['WEBEX_ACCESS_TOKEN'])
+            #webex = ciscosparkapi.CiscoSparkAPI(CONFIG_DATA['WEBEX_ACCESS_TOKEN'])
+            teams = webexteamssdk.WebexTeamsAPI(CONFIG_DATA['WEBEX_ACCESS_TOKEN'])
+
 
             # post a message to the specified Webex room
-            message = webex.messages.create(CONFIG_DATA['WEBEX_ROOM_ID'], text=message_text)
+            message = teams.messages.create(CONFIG_DATA['WEBEX_ROOM_ID'], text=message_text)
 
 ##############END PARSE FUNCTION##############START EXECUTION SCRIPT##############
 
@@ -358,13 +373,42 @@ if __name__ == "__main__":
     loadConfig()
 
     # If not hard coded, get the FMC IP, Username, and Password
-    if CONFIG_DATA['FMC_IP'] is '':
+    if CONFIG_DATA['FMC_IP'] == '':
         CONFIG_DATA['FMC_IP'] = input("FMC IP Address: ")
-    if CONFIG_DATA['FMC_USER'] is '':
+    if CONFIG_DATA['FMC_USER'] == '':
         CONFIG_DATA['FMC_USER'] = input("FMC Username: ")
-    if CONFIG_DATA['FMC_PASS'] is '':
+    if CONFIG_DATA['FMC_PASS'] == '':
         CONFIG_DATA['FMC_PASS'] = getpass.getpass("FMC Password: ")
-
+    # check with user which O365 service areas they are using
+    if CONFIG_DATA['SERVICE_AREAS'] == '':  
+        answer_input = (input("Do you use all O365 Service Areas / Applications (Exchange,SharePoint,Skype) [y/n]: ")).lower()
+        if answer_input == "y":
+            CONFIG_DATA['SERVICE_AREAS'] = 'All'
+        elif answer_input == "n":
+            service_areas = []
+            if (input("Do you use Exchange [y/n]: ")).lower() == "y":
+                service_areas.append("Exchange")
+            if (input("Do you use SharePoint [y/n]: ")).lower() == "y":
+                service_areas.append("SharePoint")
+            if (input("Do you use Skype [y/n]: ")).lower() == "y":
+                service_areas.append("Skype")
+            CONFIG_DATA['SERVICE_AREAS'] = ",".join(service_areas)
+    # check with user which O365 Plan they are using
+    if CONFIG_DATA['O365_PLAN'] is '':
+        if input("Do you use the default Worldwide O365 Plan (and not: Germany,USGovDoD,USGovGCCHigh,China) [y/n]: ") == "y":
+            CONFIG_DATA['O365_PLAN'] = "Worldwide"
+        else:
+            if (input("Do you use the Germany O365 Plan [y/n]: ")).lower() == "y":
+                CONFIG_DATA['O365_PLAN'] = "Germany"
+            elif (input("Do you use the USGovDoD O365 Plan [y/n]: ")).lower() == "y":
+                CONFIG_DATA['O365_PLAN'] = "USGovDoD"
+            elif (input("Do you use the USGovGCCHigh O365 Plan [y/n]: ")).lower() == "y":
+                CONFIG_DATA['O365_PLAN'] = "USGovGCCHigh"
+            elif (input("Do you use the China O365 Plan [y/n]: ")).lower() == "y":
+                CONFIG_DATA['O365_PLAN'] = "China"    
+    
+    sys.stdout.write(f"\n Chosen O365 plan: {CONFIG_DATA['O365_PLAN']}, chosen applications: {CONFIG_DATA['SERVICE_AREAS']}\n")
+    
     # Save the FMC data
     saveConfig()
 
@@ -377,10 +421,7 @@ if __name__ == "__main__":
             WebServiceParser()
 
     except (KeyboardInterrupt, SystemExit):
-        sys.stdout.write("\n")
-        sys.stdout.write("\n")
-        sys.stdout.write("Exiting...\n")
-        sys.stdout.write("\n")
+        sys.stdout.write("\n\nExiting...\n\n")
         sys.stdout.flush()
         pass
 
