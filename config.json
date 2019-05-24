@@ -4,6 +4,8 @@
     "FMC_PASS": "",
     "IP_UUID": "",
     "URL_UUID": "",
+    "SERVICE_AREAS": "",
+    "O365_PLAN": "",
     "SERVICE": false,
     "SSL_VERIFY": false,
     "SSL_CERT": "/path/to/certificate",
