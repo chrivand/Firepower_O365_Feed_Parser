@@ -1,10 +1,19 @@
 [![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/chrivand/Firepower_O365_Feed_Parser)
 
-# O365 Web Service API to Firepower Objects Parser 
+# O365 Web Service API to Firepower Objects Parser [v4.0]
 
 This is a sample script that parses the [NEW O365 Web Service API](https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g., Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent latency issues with the Microsoft O365 applications. 
 
 Please contact me, Christopher Van Der Made <chrivand@cisco.com>, if you have any questions or remarks. If you find any bugs, please report them to me, and I will correct them (or do a pull request).
+
+## Release notes v4.0
+
+* Added granularity so user can decide which O365 Service Area (Exchange, SharePoint, Skype) to use.
+* Added granularity so user can decide which O365 plan they have (Worldwide, Germany, USGovDoD, USGovGCCHigh, China).
+* Now only taking IPs and URLs from Optimize and Allow categories. The script is excluding Default addresses, since Microsoft does not recommend them to be excluded from inspections. These are often Third Party addresses and not hosted by Microsoft.
+* Added more CLI/Wizard questions, so that user doesn't have to fill in *config.json* file manually.
+* Script has been generally cleaned up and optimized.
+* Updated to new webexteamssdk Python library.
 
 ## Features
 
@@ -33,44 +42,45 @@ The script consists of 3 python files. The main script can run indefinitely, lev
 * Cisco Firepower Management Center;
 * Cisco Firepower Threat Defense NGFW.
 
-
 ## Installation
 
 These instructions will enable you to download the script and run it, so that the output can be used in Firepower as Group Objects. What do you need to get started? Please find a list of tasks below:
 
-1. You need the IP address (or domain name) of the FMC, the username and password. These will be requested by the script the first time it is run. It is recommended to create a separate FMC login account for API usage, otherwise the admin will be logged out during every API calls. Add the IP/Domain of FMC, the username and password to the config.json file. If you do not add anything, you will be promted to fill this in when executing the script.
+1. You need the IP address (or domain name) of the FMC, the username and password. These will be requested by the script the first time it is run. It is recommended to create a separate FMC login account for API usage, otherwise the admin will be logged out during every API calls. Add the IP/Domain of FMC, the username and password to the config.json file. If you do not add anything, you will be promted to fill this in when executing the script. 
 
-2. In the FMC, go to System > Configuration > REST API Preferences to make sure that the REST API is enabled on the FMC.
+2. The script will also prompt you for the O365 plan you are using (Worldwide, Germany, USGovDoD, USGovGCCHigh, China) and which Service Areas (Exchange, SharePoint, Skype) you are using. Potentially you can run this script multiple times to create separate objects per Service Area (for example if a set of your end-users use SharePoint, but everyone uses Exchange). Please make sure to create a separate directory with it's own version of the *config.json* file.
 
-3. A Network Group object and a URL Group object will be created automatically during the first run of the script. However, if you'd rather create the objects manually, you can follow the instructions below.
+3. In the FMC, go to System > Configuration > REST API Preferences to make sure that the REST API is enabled on the FMC.
 
-4. It is also recommended to download an SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the **config.json file**, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
+4. A Network Group object and a URL Group object will be created automatically during the first run of the script. However, if you'd rather create the objects manually, you can follow the instructions below.
 
-5. It is possible to integrate the script with Webex Teams. In order to do that, an API Access Token and a Room ID needs to be entered in the **config.json** file. Please retrieve your key from: https://developer.webex.com/docs/api/getting-started. Then create a dedicated Webex Teams space for these notifications and retrieve the Room ID from: https://developer.webex.com/docs/api/v1/rooms/list-rooms. 
+5. It is also recommended to download an SSL certificate from FMC and put it in the same folder as the scripts. This will be used to securely connect to FMC. In the **config.json file**, set the *"SSL_VERIFY"* parameter to *true*, and then set *"SSL_CERT"* to be the path to the FMC's certificate.
 
-6. In this same Webex Teams room you can subscribe to an RSS feed from Microsoft regarding updates. Use this bot to integrate the RSS feed into your Webex space: https://apphub.webex.com/bots/rss-2739. The RSS feed URL can be found on the Microsoft website (link on top of this page).
+6. It is possible to integrate the script with Webex Teams. In order to do that, an API Access Token and a Room ID need to be entered in the config.json file. Please retrieve your key from: [https://developer.webex.com/docs/api/getting-started](https://developer.webex.com/docs/api/getting-started). Then create a dedicated Webex Teams space for these notifications and retrieve the Room ID from: [https://developer.webex.com/docs/api/v1/rooms/list-rooms](https://developer.webex.com/docs/api/v1/rooms/list-rooms). Please be aware that the personal token from the getting started page only works for 12 hours. Please follow these steps to request a token per request: [https://developer.webex.com/docs/integrations](https://developer.webex.com/docs/integrations). This is roadmapped for v5.0 of the script.
 
-7. If you do not have the needed Python libraries set up, you will get an error when executing the script. You will need to install the *"requirements.txt"* file like this (make sure you are in the same directory as the cloned files live):
+7. In this same Webex Teams room you can subscribe to an RSS feed from Microsoft regarding updates. Use this bot to integrate the RSS feed into your Webex space: https://apphub.webex.com/bots/rss-2739. The RSS feed URL can be found on the Microsoft website (link on top of this page).
+
+8. If you do not have the needed Python libraries set up, you will get an error when executing the script. You will need to install the *"requirements.txt"* file like this (make sure you are in the same directory as the cloned files live):
 
 ```
 pip install -r requirements.txt
 ```
 
-8. After this is complete you need to execute the script (make sure you are in the same directory as the cloned files live):
+9. After this is complete you need to execute the script (make sure you are in the same directory as the cloned files live):
 
 ```
 python3.6 O365WebServiceParser.py
 ```
 
-9. Optionally you can let this script run periodically, by setting *"SERVICE"* to *true* in the **config.json** file. In line 374 of the **O365WebServiceParser.py** the time-period is set, per default it is set to an hour (Microsoft recommends you check the version daily, or at the most, hourly):
+10. Optionally you can let this script run periodically, by setting *"SERVICE"* to *true* in the **config.json** file. In line 374 of the **O365WebServiceParser.py** the time-period is set, per default it is set to an hour (Microsoft recommends you check the version daily, or at the most, hourly):
 
 ```
 intervalScheduler(WebServiceParser, 3600) #set to 1 hour
 ```
 
-10. Finally, if you want to automatically deploy the policies, you can set *"AUTO_DEPLOY"* to *true* in the **config.json** file. **Be very careful with this, as unfinished policies might be deployed by doing so.**
+11. Finally, if you want to automatically deploy the policies, you can set *"AUTO_DEPLOY"* to *true* in the **config.json** file. **Be very careful with this, as unfinished policies might be deployed by doing so.**
 
-### Manual Object Creation (Optional)
+### Manual Object Creation (optional, not recommended!!!)
 
 1. Create 2 Group Objects in FMC: "O365_Web_Service_URLs" (URL Group Object) and "O365_Web_Service_IPs" (Network Group Object). At first you will have to put in a random URL/Network to create the group objects. No worries, we will override this later.
 
