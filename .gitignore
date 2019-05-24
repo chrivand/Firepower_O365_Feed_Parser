@@ -8,6 +8,7 @@ __pycache__/
 
 # unnecessary to have in github
 latestVersion.txt
+config.json
 .DS_Store
 
 # Distribution / packaging
