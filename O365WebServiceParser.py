@@ -1,6 +1,6 @@
 # NOTE: this is a Proof of Concept script, please test before using in production!
 
-# Copyright (c) 2018 Cisco and/or its affiliates.
+# Copyright (c) 2019 Cisco and/or its affiliates.
 # This software is licensed to you under the terms of the Cisco Sample
 # Code License, Version 1.0 (the "License"). You may obtain a copy of the
 # License at
@@ -233,16 +233,14 @@ def WebServiceParser():
 
     # loop through version list and grab Wordwide list version
     for element in version:
-        if(element['instance'] == CONFIG_DATA['O365_PLAN']):  #TODO
+        if(element['instance'] == CONFIG_DATA['O365_PLAN']):
             newVersion = int(element['latest'])
 
     # if the version did not change, the Web Service feed was not updated. 
     if(newVersion == latestVersion):
 
         # user feed back
-        sys.stdout.write("\n")
-        sys.stdout.write("Web Service List has NOT been updated since the last load, no update needed!\n") 
-        sys.stdout.write("\n")
+        sys.stdout.write("\nWeb Service List has NOT been updated since the last load, no update needed!\n\n") 
 
     # check if there is a newer version 
     if(newVersion > latestVersion):
@@ -250,10 +248,12 @@ def WebServiceParser():
         # update version and save the config
         CONFIG_DATA['VERSION'] = newVersion
 
-        # user feedback
-        sys.stdout.write("\n")
-        sys.stdout.write(f"New version of Office 365 {CONFIG_DATA['O365_PLAN']} commercial service instance endpoints detected: {CONFIG_DATA['VERSION']}")
-        sys.stdout.write("\n")
+        if latestVersion == 0:
+            # user feedback
+            sys.stdout.write(f"\nFirst time script runs, version of Office 365 {CONFIG_DATA['O365_PLAN']} commercial service instance endpoints detected: {CONFIG_DATA['VERSION']}\n")
+        else:
+            # user feedback
+            sys.stdout.write(f"\nNew version of Office 365 {CONFIG_DATA['O365_PLAN']} commercial service instance endpoints detected: {CONFIG_DATA['VERSION']}\n")
 
         ### PARSE JSON FEED ###
 
@@ -376,38 +376,38 @@ if __name__ == "__main__":
     if CONFIG_DATA['FMC_IP'] == '':
         CONFIG_DATA['FMC_IP'] = input("FMC IP Address: ")
     if CONFIG_DATA['FMC_USER'] == '':
-        CONFIG_DATA['FMC_USER'] = input("FMC Username: ")
+        CONFIG_DATA['FMC_USER'] = input("\nFMC Username: ")
     if CONFIG_DATA['FMC_PASS'] == '':
-        CONFIG_DATA['FMC_PASS'] = getpass.getpass("FMC Password: ")
+        CONFIG_DATA['FMC_PASS'] = getpass.getpass("\nFMC Password: ")
     # check with user which O365 service areas they are using
     if CONFIG_DATA['SERVICE_AREAS'] == '':  
-        answer_input = (input("Do you use all O365 Service Areas / Applications (Exchange,SharePoint,Skype) [y/n]: ")).lower()
+        answer_input = (input("\nDo you use all O365 Service Areas / Applications (Exchange,SharePoint,Skype) [y/n]: ")).lower()
         if answer_input == "y":
             CONFIG_DATA['SERVICE_AREAS'] = 'All'
         elif answer_input == "n":
             service_areas = []
-            if (input("Do you use Exchange [y/n]: ")).lower() == "y":
+            if (input("\nDo you use Exchange [y/n]: ")).lower() == "y":
                 service_areas.append("Exchange")
-            if (input("Do you use SharePoint [y/n]: ")).lower() == "y":
+            if (input("\nDo you use SharePoint [y/n]: ")).lower() == "y":
                 service_areas.append("SharePoint")
-            if (input("Do you use Skype [y/n]: ")).lower() == "y":
+            if (input("\nDo you use Skype [y/n]: ")).lower() == "y":
                 service_areas.append("Skype")
             CONFIG_DATA['SERVICE_AREAS'] = ",".join(service_areas)
     # check with user which O365 Plan they are using
     if CONFIG_DATA['O365_PLAN'] is '':
-        if input("Do you use the default Worldwide O365 Plan (and not: Germany,USGovDoD,USGovGCCHigh,China) [y/n]: ") == "y":
+        if input("\nDo you use the default Worldwide O365 Plan (and not: Germany,USGovDoD,USGovGCCHigh,China) [y/n]: ") == "y":
             CONFIG_DATA['O365_PLAN'] = "Worldwide"
         else:
-            if (input("Do you use the Germany O365 Plan [y/n]: ")).lower() == "y":
+            if (input("\nDo you use the Germany O365 Plan [y/n]: ")).lower() == "y":
                 CONFIG_DATA['O365_PLAN'] = "Germany"
-            elif (input("Do you use the USGovDoD O365 Plan [y/n]: ")).lower() == "y":
+            elif (input("\nDo you use the USGovDoD O365 Plan [y/n]: ")).lower() == "y":
                 CONFIG_DATA['O365_PLAN'] = "USGovDoD"
-            elif (input("Do you use the USGovGCCHigh O365 Plan [y/n]: ")).lower() == "y":
+            elif (input("\nDo you use the USGovGCCHigh O365 Plan [y/n]: ")).lower() == "y":
                 CONFIG_DATA['O365_PLAN'] = "USGovGCCHigh"
-            elif (input("Do you use the China O365 Plan [y/n]: ")).lower() == "y":
+            elif (input("\nDo you use the China O365 Plan [y/n]: ")).lower() == "y":
                 CONFIG_DATA['O365_PLAN'] = "China"    
     
-    sys.stdout.write(f"\n Chosen O365 plan: {CONFIG_DATA['O365_PLAN']}, chosen applications: {CONFIG_DATA['SERVICE_AREAS']}\n")
+    sys.stdout.write(f"\nChosen O365 plan: {CONFIG_DATA['O365_PLAN']}, chosen applications: {CONFIG_DATA['SERVICE_AREAS']}\n")
     
     # Save the FMC data
     saveConfig()
