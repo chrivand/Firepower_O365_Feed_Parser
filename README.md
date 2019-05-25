@@ -6,6 +6,12 @@ This is a sample script that parses the [NEW O365 Web Service API](https://docs.
 
 Please contact me, Christopher Van Der Made <chrivand@cisco.com>, if you have any questions or remarks. If you find any bugs, please report them to me, and I will correct them (or do a pull request).
 
+If you would like to see a demo of the script, please check out the video below: 
+
+[https://youtu.be/nY9nWVrgO4I](https://youtu.be/nY9nWVrgO4I)
+
+[![Alt text](https://img.youtube.com/vi/cCe3y6XZqs0/0.jpg)](https://www.youtube.com/watch?v=nY9nWVrgO4I)
+
 ## Release notes v4.0
 
 * Added granularity so user can decide which O365 Service Area (Exchange, SharePoint, Skype) to use.
