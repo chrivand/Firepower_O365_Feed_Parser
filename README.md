@@ -10,7 +10,7 @@ If you would like to see a demo of the script, please check out the video below:
 
 [https://youtu.be/nY9nWVrgO4I](https://youtu.be/nY9nWVrgO4I)
 
-[![Alt text](https://img.youtube.com/vi/cCe3y6XZqs0/0.jpg)](https://www.youtube.com/watch?v=nY9nWVrgO4I)
+[![Alt text](https://img.youtube.com/vi/nY9nWVrgO4I/0.jpg)](https://www.youtube.com/watch?v=nY9nWVrgO4I)
 
 ## Release notes v4.0
 
