@@ -445,7 +445,7 @@ def WebServiceParser():
             DeployPolicies(fmc)
         
         # if Webex Teams tokens set, then send message to Webex room
-        if CONFIG_DATA['WEBEX_ACCESS_TOKEN'] is '' or CONFIG_DATA['WEBEX_ROOM_ID'] is '':
+        if CONFIG_DATA['WEBEX_ACCESS_TOKEN'] == '' or CONFIG_DATA['WEBEX_ROOM_ID'] == '':
 
             # user feed back
             sys.stdout.write("Webex Teams not set.\n")
