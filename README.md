@@ -1,6 +1,6 @@
 [![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/chrivand/Firepower_O365_Feed_Parser)
 
-# O365 Web Service API to Firepower Objects Parser [v4.0]
+# O365 Web Service API to Firepower Objects Parser [v4.1 MINOR]
 
 This is a sample script that parses the [NEW O365 Web Service API](https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g., Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent latency issues with the Microsoft O365 applications. 
 
@@ -12,22 +12,19 @@ If you would like to see a demo of the script, please check out the video below:
 
 [![Alt text](https://img.youtube.com/vi/nY9nWVrgO4I/0.jpg)](https://www.youtube.com/watch?v=nY9nWVrgO4I)
 
-## Release notes v4.0
+## Release notes v4.1
 
-* Added granularity so user can decide which O365 Service Area (Exchange, SharePoint, Skype) to use.
-* Added granularity so user can decide which O365 plan they have (Worldwide, Germany, USGovDoD, USGovGCCHigh, China).
-* Now only taking IPs and URLs from Optimize and Allow categories. The script is excluding Default addresses, since Microsoft does not recommend them to be excluded from inspections. These are often Third Party addresses and not hosted by Microsoft.
-* Added more CLI/Wizard questions, so that user doesn't have to fill in *config.json* file manually.
-* Script has been generally cleaned up and optimized.
-* Updated to new webexteamssdk Python library.
+* Minor update from version v4.0 that creates 4 group objects in instead of 2. 
+* It now creates 2 URL group objects for Optimize+Allow and for Default category, and does the same for the IP group objects.
+* Some other changes include the optimization of the script (e.g. it will only do FMC requests if a new version is detected of the O365 script).
 
 ## Features
 
 * Retrieving Wordlwide URLs and IPs from new O365 REST-based web service; 
-* Parsing these into 2 flat lists (URL and IP (mixed IPv4 and IPv6));
+* Parsing these into 4 flat lists (URL and IP (mixed IPv4 and IPv6) for Optimize+Allow and Default category);
 * Creating right JSON format for FMC API PUT requests;
 * Uploading this JSON to FMC, overwriting the previous Group Object;
-* If no objects have been created, 2 overridable objects will be created: 'O365_Web_Service_IPs' and 'O365_Web_Service_URLs';
+* If no objects have been created, 4 overridable objects will be created: 'O365_Web_Service_IPs' and 'O365_Web_Service_URLs';
 * Checking if O365 file was updated, using the O365 Version API Endpoint;
 * Automatic policy deploy using API when changes were made to Objects (optional, caution this will also deploy other, unrelated policy changes);
 * Webex Teams alert when changes were made to Objects;
