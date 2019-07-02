@@ -20,14 +20,13 @@ import sys
 import datetime
 import time
 import uuid
-#import ciscosparkapi
 import webexteamssdk
 
 # import supporting functions from additional file
 from Firepower import Firepower
 
 # Config Paramters
-CONFIG_FILE     = "config_file.json"
+CONFIG_FILE     = "config.json"
 CONFIG_DATA     = None
 
 # Object Prefix
