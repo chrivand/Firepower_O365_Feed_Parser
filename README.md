@@ -126,6 +126,18 @@ Likewise, this can be done with a Trust Rule in the Access Control Policy for th
 
 As a final step you will need to do a Policy Deploy, each time that the Group Objects have been updated. This can be done from the FMC by clicking on *"DEPLOY"* and by selecting the device that need this Policy Deploy.
 
+### Using the Objects in AnyConnect Profiles for Split Tunneling (not tested yet):
+
+I have not tested this yet but it is possible to use the created Network Group Objects for exclusion in your VPN tunnel. This can be done by creating or editing an AnyConnect Profile like below:
+
+![vpn-group-policy](vpn-group-policy.png)
+
+You can then add the Network Group Object as an ACL to be excluded from the VPN tunnel (split tunneling):
+
+![vpn-acl](vpn-acl.png)
+
+Please test this thorougly before using in production!
+
 ### Please take caution on the following notes:
 
 * Please be aware that a policy redeploy is needed to update the Group Objects in the used Policies. Currently there is an optional API call built in to do a policy redeploy, however please take caution in using this, since this might cause other, unrelated policies or objects to be deployed (e.g., if another network administrator is working on a Policy in the GUI).
