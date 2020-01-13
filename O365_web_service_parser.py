@@ -15,15 +15,18 @@
 import getpass
 import json
 import os
+import ipaddress
 import requests
 import sys
 import datetime
 import time
 import uuid
 import webexteamssdk
+from pprint import pprint
 
 # import supporting functions from additional file
 from Firepower import Firepower
+from Asa import Asa
 
 # Config Paramters
 CONFIG_FILE     = "config.json"
@@ -63,6 +66,10 @@ def loadConfig():
             "FMC_IP": "",
             "FMC_USER": "",
             "FMC_PASS": "",
+            "ASA_IP": "",
+            "ASA_USER": "",
+            "ASA_PASS": "",
+            "ASA_OBJECTNAME": "",
             "IP_BYPASS_UUID": "",
             "IP_DEFAULT_UUID": "",
             "URL_BYPASS_UUID": "",
@@ -77,6 +84,17 @@ def loadConfig():
             "WEBEX_ACCESS_TOKEN": "",
             "WEBEX_ROOM_ID": "",
         }
+
+def isASA():
+    return CONFIG_DATA['ASA_IP'] != '' \
+        and CONFIG_DATA['ASA_USER'] != '' \
+        and CONFIG_DATA['ASA_PASS'] != '' \
+        and CONFIG_DATA['ASA_OBJECTNAME'] != ''
+
+def isFMC():
+    return CONFIG_DATA['FMC_IP'] != '' \
+        and CONFIG_DATA['FMC_USER'] != '' \
+        and CONFIG_DATA['FMC_PASS'] != ''
 
 # A function to store CONFIG_DATA to file
 def saveConfig():
@@ -224,89 +242,96 @@ def WebServiceParser():
     bool_new_version = check_for_new_version(clientRequestId)
 
     if bool_new_version == True:
-        # Instantiate a Firepower object
-        fmc = Firepower(CONFIG_DATA)
 
-        # If there's no defined Network Object, make one, then store the UUID - else, get the current object
-        if CONFIG_DATA['IP_BYPASS_UUID'] is '':
+        if isFMC():
+            # Instantiate a Firepower object 
+            fmc = Firepower(CONFIG_DATA)
 
-            # Create the JSON to submit
-            object_json = {
-                'name': OBJECT_PREFIX + "O365_IPs_BYPASS_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
-                'type': 'NetworkGroup',
-                'overridable': True,
-            }
+            # If there's no defined Network Object, make one, then store the UUID - else, get the current object
+            if CONFIG_DATA['IP_BYPASS_UUID'] is '':
 
-            print(object_json)
+                # Create the JSON to submit
+                object_json = {
+                    'name': OBJECT_PREFIX + "O365_IPs_BYPASS_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
+                    'type': 'NetworkGroup',
+                    'overridable': True,
+                }
 
-            # Create the Network Group object in the FMC
-            ip_group_object = fmc.createObject('networkgroups', object_json)
+                print(object_json)
 
-            # Save the UUID of the object
-            CONFIG_DATA['IP_BYPASS_UUID'] = ip_group_object['id']
-            saveConfig()
-        else:
-            # Get the Network Group object of the specified UUID
-            ip_group_object = fmc.getObject('networkgroups', CONFIG_DATA['IP_BYPASS_UUID'])
+                # Create the Network Group object in the FMC
+                ip_group_object = fmc.createObject('networkgroups', object_json)
 
-        # If there's no defined Default Network Object, make one, then store the UUID - else, get the current object
-        if CONFIG_DATA["IP_DEFAULT_UUID"] is '':
-            # Create the JSON to submit
-            object_json = {
-                'name': OBJECT_PREFIX + "O365_IPs_DEFAULT_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
-                'type': 'NetworkGroup',
-                'overridable': True,
-            }
+                # Save the UUID of the object
+                CONFIG_DATA['IP_BYPASS_UUID'] = ip_group_object['id']
+                saveConfig()
+            else:
+                # Get the Network Group object of the specified UUID
+                ip_group_object = fmc.getObject('networkgroups', CONFIG_DATA['IP_BYPASS_UUID'])
 
-            # Create the Network Group object in the FMC
-            ip_default_group_object = fmc.createObject('networkgroups', object_json)
+            # If there's no defined Default Network Object, make one, then store the UUID - else, get the current object
+            if CONFIG_DATA["IP_DEFAULT_UUID"] is '':
+                # Create the JSON to submit
+                object_json = {
+                    'name': OBJECT_PREFIX + "O365_IPs_DEFAULT_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
+                    'type': 'NetworkGroup',
+                    'overridable': True,
+                }
 
-            # Save the UUID of the object
-            CONFIG_DATA['IP_DEFAULT_UUID'] = ip_default_group_object['id']
-            saveConfig()
-        else:
-            # Get the Network Group object of the specified UUID
-            ip_default_group_object = fmc.getObject('networkgroups', CONFIG_DATA['IP_DEFAULT_UUID'])
+                # Create the Network Group object in the FMC
+                ip_default_group_object = fmc.createObject('networkgroups', object_json)
 
-        # If there's no defined URL Object, make one, then store the UUID
-        if CONFIG_DATA['URL_BYPASS_UUID'] is '':
+                # Save the UUID of the object
+                CONFIG_DATA['IP_DEFAULT_UUID'] = ip_default_group_object['id']
+                saveConfig()
+            else:
+                # Get the Network Group object of the specified UUID
+                ip_default_group_object = fmc.getObject('networkgroups', CONFIG_DATA['IP_DEFAULT_UUID'])
 
-            # Create the JSON to submit
-            object_json = {
-                'name': OBJECT_PREFIX + "O365_URLs_BYPASS_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
-                'type': 'UrlGroup',
-                'overridable': True,
-            }
+            # If there's no defined URL Object, make one, then store the UUID
+            if CONFIG_DATA['URL_BYPASS_UUID'] is '':
 
-            # Create the URL Group object in the FMC
-            url_group_object = fmc.createObject('urlgroups', object_json)
+                # Create the JSON to submit
+                object_json = {
+                    'name': OBJECT_PREFIX + "O365_URLs_BYPASS_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
+                    'type': 'UrlGroup',
+                    'overridable': True,
+                }
 
-            # Save the UUID of the object
-            CONFIG_DATA['URL_BYPASS_UUID'] = url_group_object['id']
-            saveConfig()
-        else:
-            # Get the URL Group object of the specified UUID
-            url_group_object = fmc.getObject('urlgroups', CONFIG_DATA['URL_BYPASS_UUID'])
+                # Create the URL Group object in the FMC
+                url_group_object = fmc.createObject('urlgroups', object_json)
 
-        # If there's no defined Default URL Object, make one, then store the UUID
-        if CONFIG_DATA['URL_DEFAULT_UUID'] is '':
+                # Save the UUID of the object
+                CONFIG_DATA['URL_BYPASS_UUID'] = url_group_object['id']
+                saveConfig()
+            else:
+                # Get the URL Group object of the specified UUID
+                url_group_object = fmc.getObject('urlgroups', CONFIG_DATA['URL_BYPASS_UUID'])
 
-            # Create the JSON to submit
-            object_json = {
-                'name': OBJECT_PREFIX + "O365_URLs_DEFAULT_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
-                'type': 'UrlGroup',
-                'overridable': True,
-            }
+            # If there's no defined Default URL Object, make one, then store the UUID
+            if CONFIG_DATA['URL_DEFAULT_UUID'] is '':
 
-            # Create the URL Group object in the FMC
-            url_default_group_object = fmc.createObject('urlgroups', object_json)
+                # Create the JSON to submit
+                object_json = {
+                    'name': OBJECT_PREFIX + "O365_URLs_DEFAULT_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
+                    'type': 'UrlGroup',
+                    'overridable': True,
+                }
 
-            # Save the UUID of the object
-            CONFIG_DATA['URL_DEFAULT_UUID'] = url_default_group_object['id']
-            saveConfig()
-        else:
-            # Get the URL Group object of the specified UUID
-            url_default_group_object = fmc.getObject('urlgroups', CONFIG_DATA['URL_DEFAULT_UUID'])
+                # Create the URL Group object in the FMC
+                url_default_group_object = fmc.createObject('urlgroups', object_json)
+
+                # Save the UUID of the object
+                CONFIG_DATA['URL_DEFAULT_UUID'] = url_default_group_object['id']
+                saveConfig()
+            else:
+                # Get the URL Group object of the specified UUID
+                url_default_group_object = fmc.getObject('urlgroups', CONFIG_DATA['URL_DEFAULT_UUID'])
+
+        elif isASA():
+            #just instantiate the asa object
+            asa=Asa(CONFIG_DATA)
+
 
         ### PARSE JSON FEED ###
 
@@ -382,55 +407,84 @@ def WebServiceParser():
                         if ip not in IP_List:
                             IP_default_list.append(ip)
 
-        # Reset the fetched Network Group object to clear the 'literals'
-        ip_group_object['literals'] = []
-        ip_group_object.pop('links', None)
+        if isFMC():
+            # Reset the fetched Network Group object to clear the 'literals'
+            ip_group_object['literals'] = []
+            ip_group_object.pop('links', None)
 
-        # Add all the fetched IPs to the 'literals'of the Network Group object
-        for ip_address in IP_List:
-            ip_group_object['literals'].append({'type': 'Network', 'value': ip_address})
+            # Add all the fetched IPs to the 'literals'of the Network Group object
+            for ip_address in IP_List:
+                ip_group_object['literals'].append({'type': 'Network', 'value': ip_address})
 
-        # Update the NetworkGroup object
-        fmc.updateObject('networkgroups', CONFIG_DATA['IP_BYPASS_UUID'], ip_group_object)
-
-
-
-        # Reset the fetched DEFAULT Network Group object to clear the 'literals'
-        ip_default_group_object['literals'] = []
-        ip_default_group_object.pop('links', None)
-
-        # Add all the fetched IPs to the 'literals'of the Network Group object
-        for ip_address in IP_default_list:
-            ip_default_group_object['literals'].append({'type': 'Network', 'value': ip_address})
-
-        # Update the NetworkGroup object
-        fmc.updateObject('networkgroups', CONFIG_DATA['IP_DEFAULT_UUID'], ip_default_group_object)
+            # Update the NetworkGroup object
+            fmc.updateObject('networkgroups', CONFIG_DATA['IP_BYPASS_UUID'], ip_group_object)
 
 
 
-        # Reset the fetched URL Group object to clear the 'literals'
-        url_group_object['literals'] = []
-        url_group_object.pop('links', None)
+            # Reset the fetched DEFAULT Network Group object to clear the 'literals'
+            ip_default_group_object['literals'] = []
+            ip_default_group_object.pop('links', None)
 
-        # Add all the fetched URLs to the 'literals' of the URL Group object
-        for url in URL_List:
-            url_group_object['literals'].append({'type': 'Url', 'url': url})
+            # Add all the fetched IPs to the 'literals'of the Network Group object
+            for ip_address in IP_default_list:
+                ip_default_group_object['literals'].append({'type': 'Network', 'value': ip_address})
 
-        # Update the UrlGroup object
-        fmc.updateObject('urlgroups', CONFIG_DATA['URL_BYPASS_UUID'], url_group_object)
+            # Update the NetworkGroup object
+            fmc.updateObject('networkgroups', CONFIG_DATA['IP_DEFAULT_UUID'], ip_default_group_object)
 
 
-        # Reset the fetched URL Group object to clear the 'literals'
-        url_default_group_object['literals'] = []
-        url_default_group_object.pop('links', None)
 
-        # Add all the fetched URLs to the 'literals' of the URL Group object
-        for url in URL_default_list:
-            url_default_group_object['literals'].append({'type': 'Url', 'url': url})
+            # Reset the fetched URL Group object to clear the 'literals'
+            url_group_object['literals'] = []
+            url_group_object.pop('links', None)
 
-        # Update the UrlGroup object
-        fmc.updateObject('urlgroups', CONFIG_DATA['URL_DEFAULT_UUID'], url_default_group_object)
+            # Add all the fetched URLs to the 'literals' of the URL Group object
+            for url in URL_List:
+                url_group_object['literals'].append({'type': 'Url', 'url': url})
 
+            # Update the UrlGroup object
+            fmc.updateObject('urlgroups', CONFIG_DATA['URL_BYPASS_UUID'], url_group_object)
+
+
+            # Reset the fetched URL Group object to clear the 'literals'
+            url_default_group_object['literals'] = []
+            url_default_group_object.pop('links', None)
+
+            # Add all the fetched URLs to the 'literals' of the URL Group object
+            for url in URL_default_list:
+                url_default_group_object['literals'].append({'type': 'Url', 'url': url})
+
+            # Update the UrlGroup object
+            fmc.updateObject('urlgroups', CONFIG_DATA['URL_DEFAULT_UUID'], url_default_group_object)
+        elif isASA():
+            #send ASA commands
+            ASA_object_commands_List=[]
+            for ip in IP_List:
+                theAddress=ipaddress.ip_network(ip)
+                if theAddress.version==4:
+                    theNetmask=str(theAddress.netmask)
+                    theNetworkAddress=str(theAddress.network_address)
+                    if theNetmask!='255.255.255.255':
+                        ASA_object_commands_List.append('network-object '+theNetworkAddress+' '+theNetmask)
+                    else:
+                        ASA_object_commands_List.append('network-object host '+theNetworkAddress)
+            if len(ASA_object_commands_List)!=0:
+                #remove the previous object if there
+                theCommand="show running-config | include object-group network "+CONFIG_DATA['ASA_OBJECTNAME']
+                output = asa.doCommand(theCommand)
+                if output=="":
+                    print("There is no previous network-object, creating new")
+                else:
+                    print("The network-object object exists, removing before re-creating")
+                    theCommand="no object-group network "+CONFIG_DATA['ASA_OBJECTNAME']
+                    output = asa.doCommand(theCommand)
+
+                theCommands=[]
+                theCommands.append("object-group network "+CONFIG_DATA['ASA_OBJECTNAME'])
+                for subCommand in ASA_object_commands_List:
+                    theCommands.append(subCommand)
+                result=asa.doCommands(theCommands)
+                pprint(result)
 
 
         # user feed back
@@ -441,8 +495,9 @@ def WebServiceParser():
         saveConfig()
 
         # If the user wants us to deploy policies, then do it
-        if CONFIG_DATA['AUTO_DEPLOY']:
-            DeployPolicies(fmc)
+        if isFMC():
+            if CONFIG_DATA['AUTO_DEPLOY']:
+                DeployPolicies(fmc)
         
         # if Webex Teams tokens set, then send message to Webex room
         if CONFIG_DATA['WEBEX_ACCESS_TOKEN'] == '' or CONFIG_DATA['WEBEX_ROOM_ID'] == '':
@@ -476,13 +531,29 @@ if __name__ == "__main__":
     # Load config data from file
     loadConfig()
 
-    # If not hard coded, get the FMC IP, Username, and Password
-    if CONFIG_DATA['FMC_IP'] == '':
-        CONFIG_DATA['FMC_IP'] = input("FMC IP Address: ")
-    if CONFIG_DATA['FMC_USER'] == '':
-        CONFIG_DATA['FMC_USER'] = input("\nFMC Username: ")
-    if CONFIG_DATA['FMC_PASS'] == '':
-        CONFIG_DATA['FMC_PASS'] = getpass.getpass("\nFMC Password: ")
+    deviceAnswer=input("Which device? FirePower or ASA, no or skip(f/a): ").lower().strip()[:1]
+    if deviceAnswer=="f":
+        # If not hard coded, get the FMC IP, Username, and Password
+        if CONFIG_DATA['FMC_IP'] == '':
+            CONFIG_DATA['FMC_IP'] = input("FMC IP Address: ")
+        if CONFIG_DATA['FMC_USER'] == '':
+            CONFIG_DATA['FMC_USER'] = input("\nFMC Username: ")
+        if CONFIG_DATA['FMC_PASS'] == '':
+            CONFIG_DATA['FMC_PASS'] = getpass.getpass("\nFMC Password: ")
+    elif deviceAnswer=="a":
+        # If not hard coded, get the FMC IP, Username, and Password
+        if CONFIG_DATA['ASA_IP'] == '':
+            CONFIG_DATA['ASA_IP'] = input("ASA IP Address: ")
+        if CONFIG_DATA['ASA_USER'] == '':
+            CONFIG_DATA['ASA_USER'] = input("\nASA Username: ")
+        if CONFIG_DATA['ASA_PASS'] == '':
+            CONFIG_DATA['ASA_PASS'] = getpass.getpass("\nASA Password: ")
+        if CONFIG_DATA['ASA_OBJECTNAME'] == '':
+            CONFIG_DATA['ASA_OBJECTNAME'] = input("\nASA Network Object Name: ")
+    else:
+        print("Invalid device.")
+        sys.exit(1)
+
     # check with user which O365 service areas they are using
     if CONFIG_DATA['SERVICE_AREAS'] == '':  
         answer_input = (input("\nDo you use all O365 Service Areas / Applications (Exchange,SharePoint,Skype) [y/n]: ")).lower()
