@@ -14,7 +14,7 @@ If you would like to see a demo of the script, please check out the video below:
 
 ## Release notes v4.2
 
-* Added ASA module. Onlu updates one ASA device at a time
+* Added ASA module. Only updates one ASA device at a time
 
 ## Release notes v4.1
 
