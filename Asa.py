@@ -16,15 +16,20 @@ import requests
 from netmiko import ConnectHandler
 from pprint import pprint
 from requests.auth import HTTPBasicAuth
+import http
 
 # A class to handle communication to the Firepower Management Console (FMC) APIs
 class Asa:
+    # Header and URI for REST call
+    headers = { 'Content-Type': 'application/json','User-Agent': 'REST API Agent'}
+    networkObjectGroupforREST = '/api/objects/networkobjectgroups'
 
     def __init__(self, config_data):
         self.asa_ip     = config_data['ASA_IP']
         self.asa_user   = config_data['ASA_USER']
         self.asa_pass   = config_data['ASA_PASS']
         self.asa_objectname = config_data['ASA_OBJECTNAME']
+        self.asa_connect_mode = config_data['ASA_CONNECT_MODE'].lower().strip()[:1]
 
         if not config_data['SSL_VERIFY']:
             requests.packages.urllib3.disable_warnings()
@@ -32,7 +37,8 @@ class Asa:
         else:
             self.ssl_verify = config_data['SSL_CERT']
 
-        self.doConnection()
+        if self.asa_connect_mode == 's':
+            self.doConnection()
 
     def doConnection(self):
 
@@ -77,4 +83,47 @@ class Asa:
 
         except Exception as err:
             print('Error sending commands to ASA: ' + str(err))
+            exit()
+
+    # Implementation for ASA Web API/REST call to create, to delete and to get the Network Group Object
+    def urlEndpoint(self):
+        return "https://" + self.asa_ip
+
+    def getNetworkGroupObject(self,objectName):
+        url = self.urlEndpoint() + self.networkObjectGroupforREST + '/' + objectName
+        response = requests.get(url,headers=self.headers,auth=(self.asa_user,self.asa_pass),verify=False)
+
+        if (response.status_code == 200):
+            return response.json()
+        elif (response.status_code == 404):
+            return response.status_code
+        else:
+            print("{} : {}".format(response.status_code,http.HTTPStatus(response.status_code).phrase))
+            exit()
+
+    # To create Network Group Object
+    def createNetworkGroupObject(self,objectName,members,desc="created by Script"):
+        url = self.urlEndpoint() + self.networkObjectGroupforREST
+        # payload for the REST Call
+        payload={"kind": "object#NetworkObjGroup","name": objectName,"description": desc,"members": members}
+        response = requests.post(url,headers=self.headers,auth=(self.asa_user,self.asa_pass),json=payload,verify=False)
+
+        if (response.status_code == 201):
+            message = 'successfully created.'
+            return "{}({})".format(message,response.status_code)
+        else:
+            message =http.HTTPStatus(response.status_code).phrase
+            print("{} : {}".format(response.status_code,message))
+            exit()
+
+    def removeNetworkGroupObject(self,objectName):
+        url = self.urlEndpoint() + self.networkObjectGroupforREST + '/' + objectName
+        response = requests.delete(url,headers=self.headers,auth=(self.asa_user,self.asa_pass),verify=False)
+
+        if (response.status_code == 204):
+            message = 'Object Removed Successfully'
+            return "{} : {}".format(response.status_code,message)
+        else:
+            message = http.HTTPStatus(response.status_code).phrase
+            print("{} : {}".format(response.status_code,message))
             exit()

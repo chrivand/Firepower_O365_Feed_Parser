@@ -6,6 +6,7 @@
     "ASA_USER": "",
     "ASA_PASS": "",
     "ASA_OBJECTNAME": "",
+    "ASA_CONNECT_MODE": "",
     "IP_BYPASS_UUID": "",
     "IP_DEFAULT_UUID": "",
     "URL_BYPASS_UUID": "",

@@ -70,6 +70,7 @@ def loadConfig():
             "ASA_USER": "",
             "ASA_PASS": "",
             "ASA_OBJECTNAME": "",
+            "ASA_CONNECT_MODE": "",
             "IP_BYPASS_UUID": "",
             "IP_DEFAULT_UUID": "",
             "URL_BYPASS_UUID": "",
@@ -457,35 +458,59 @@ def WebServiceParser():
             # Update the UrlGroup object
             fmc.updateObject('urlgroups', CONFIG_DATA['URL_DEFAULT_UUID'], url_default_group_object)
         elif isASA():
-            #send ASA commands
-            ASA_object_commands_List=[]
-            for ip in IP_List:
-                theAddress=ipaddress.ip_network(ip)
-                if theAddress.version==4:
-                    theNetmask=str(theAddress.netmask)
-                    theNetworkAddress=str(theAddress.network_address)
-                    if theNetmask!='255.255.255.255':
-                        ASA_object_commands_List.append('network-object '+theNetworkAddress+' '+theNetmask)
-                    else:
-                        ASA_object_commands_List.append('network-object host '+theNetworkAddress)
-            if len(ASA_object_commands_List)!=0:
-                #remove the previous object if there
-                theCommand="show running-config | include object-group network "+CONFIG_DATA['ASA_OBJECTNAME']
-                output = asa.doCommand(theCommand)
-                if output=="":
-                    print("There is no previous network-object, creating new")
-                else:
-                    print("The network-object object exists, removing before re-creating")
-                    theCommand="no object-group network "+CONFIG_DATA['ASA_OBJECTNAME']
+            if CONFIG_DATA['ASA_CONNECT_MODE'].lower().strip()[:1] == 's':
+                ASA_object_commands_List=[]
+
+                for ip in IP_List:
+                    theAddress=ipaddress.ip_network(ip)
+                    if theAddress.version==4:
+                        theNetmask=str(theAddress.netmask)
+                        theNetworkAddress=str(theAddress.network_address)
+                        if theNetmask!='255.255.255.255':
+                            ASA_object_commands_List.append('network-object '+theNetworkAddress+' '+theNetmask)
+                        else:
+                            ASA_object_commands_List.append('network-object host '+theNetworkAddress)
+
+                if len(ASA_object_commands_List)!=0:
+                    #remove the previous object if there
+                    theCommand="show running-config | include object-group network "+CONFIG_DATA['ASA_OBJECTNAME']
                     output = asa.doCommand(theCommand)
+                    if output=="":
+                        print("There is no previous network-object, creating new")
+                    else:
+                        print("The network-object object exists, removing before re-creating")
+                        theCommand="no object-group network "+CONFIG_DATA['ASA_OBJECTNAME']
+                        output = asa.doCommand(theCommand)
 
-                theCommands=[]
-                theCommands.append("object-group network "+CONFIG_DATA['ASA_OBJECTNAME'])
-                for subCommand in ASA_object_commands_List:
-                    theCommands.append(subCommand)
-                result=asa.doCommands(theCommands)
-                pprint(result)
+                    theCommands=[]
+                    theCommands.append("object-group network "+CONFIG_DATA['ASA_OBJECTNAME'])
+                    for subCommand in ASA_object_commands_List:
+                        theCommands.append(subCommand)
+                    result=asa.doCommands(theCommands)
+                    pprint(result)
+            else:
+                ASA_member_list=[]
+                objectName=CONFIG_DATA['ASA_OBJECTNAME']
 
+                for ip in IP_List:
+                    theAddress=ipaddress.ip_network(ip)
+                    if theAddress.version==4:
+                        theNetmask=str(theAddress.netmask)
+                        theNetworkAddress=str(theAddress.network_address)
+                        if theNetmask!='255.255.255.255':
+                            member = { "kind": "IPv4Network", "value": str(theAddress) }
+                            ASA_member_list.append(member)
+                        else:
+                            member = { "kind": "IPv4Address", "value": theNetworkAddress }
+                            ASA_member_list.append(member)
+
+                if (asa.getNetworkGroupObject(objectName) != 404):
+                    print("Overriding \"{}\" NetworkGroupObject ".format(objectName))
+                    asa.removeNetworkGroupObject(objectName)
+
+                print("ASA Object : " + asa.createNetworkGroupObject(objectName,ASA_member_list,desc="from O365_web_service_parser script"))
+                print("Trying to access newly created Object")
+                pprint(asa.getNetworkGroupObject(objectName))
 
         # user feed back
         sys.stdout.write("\n")
@@ -550,6 +575,8 @@ if __name__ == "__main__":
             CONFIG_DATA['ASA_PASS'] = getpass.getpass("\nASA Password: ")
         if CONFIG_DATA['ASA_OBJECTNAME'] == '':
             CONFIG_DATA['ASA_OBJECTNAME'] = input("\nASA Network Object Name: ")
+        if CONFIG_DATA['ASA_CONNECT_MODE'] == '':
+            CONFIG_DATA['ASA_CONNECT_MODE'] = input("\nASA connect Mode (API,SSH) [a/s]: ")
     else:
         print("Invalid device.")
         sys.exit(1)
