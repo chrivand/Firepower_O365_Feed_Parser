@@ -16,6 +16,7 @@ If you would like to see a demo of the script, please check out the video below:
 
 * Minor update from version v4.0 that creates 4 group objects in instead of 2. 
 * It now creates 2 URL group objects for Optimize+Allow and for Default category, and does the same for the IP group objects.
+* It adds a dummy IP range (240.0.0.0/4) or dummy URL (example.com), if Microsoft does not return any addresses. Microsoft does not always return full lists. Sometimes they only return the Default URL’s for example, since they don’t own those IP ranges. This can cause a Policy Deploy failure, hence the dummy addresses.
 * Some other changes include the optimization of the script (e.g. it will only do FMC requests if a new version is detected of the O365 script).
 * Executing of the script is exactly the same as before, it now just creates 4 objects. The BYPASS objects are recommended to be bypassed (like in a prefilter rule), the DEFAULT objects are recommended to be treated just like other internet traffic.
 
