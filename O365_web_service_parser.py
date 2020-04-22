@@ -386,6 +386,13 @@ def WebServiceParser():
         ip_group_object['literals'] = []
         ip_group_object.pop('links', None)
 
+        # check whether list not empty (microsoft sometimes doesn't return IP's for default IP addresses for example)
+        if not IP_List:
+            IP_List.append("240.0.0.0/4")
+            # user feed back
+            sys.stdout.write("\n")
+            sys.stdout.write("IP_BYPASS list returned no IP's, empty list with dummy IP range (240.0.0.0/4) created (to avoid policy deploy failure)...\n")
+        
         # Add all the fetched IPs to the 'literals'of the Network Group object
         for ip_address in IP_List:
             ip_group_object['literals'].append({'type': 'Network', 'value': ip_address})
@@ -399,6 +406,13 @@ def WebServiceParser():
         ip_default_group_object['literals'] = []
         ip_default_group_object.pop('links', None)
 
+        # check whether list not empty (microsoft sometimes doesn't return IP's for default IP addresses for example)
+        if not IP_default_list:
+            IP_default_list.append("240.0.0.0/4")
+            # user feed back
+            sys.stdout.write("\n")
+            sys.stdout.write("IP_DEFAULT list returned no IP's, empty list with dummy IP range (240.0.0.0/4) created (to avoid policy deploy failure)...\n")
+        
         # Add all the fetched IPs to the 'literals'of the Network Group object
         for ip_address in IP_default_list:
             ip_default_group_object['literals'].append({'type': 'Network', 'value': ip_address})
@@ -412,6 +426,13 @@ def WebServiceParser():
         url_group_object['literals'] = []
         url_group_object.pop('links', None)
 
+        # check whether list not empty
+        if not URL_List:
+            URL_List.append("example.com")
+            # user feed back
+            sys.stdout.write("\n")
+            sys.stdout.write("URL_BYPASS list returned no URL's, empty list with dummy URL (example.com) created (to avoid policy deploy failure)...\n")
+        
         # Add all the fetched URLs to the 'literals' of the URL Group object
         for url in URL_List:
             url_group_object['literals'].append({'type': 'Url', 'url': url})
@@ -423,6 +444,14 @@ def WebServiceParser():
         # Reset the fetched URL Group object to clear the 'literals'
         url_default_group_object['literals'] = []
         url_default_group_object.pop('links', None)
+
+        
+        # check whether list not empty
+        if not URL_List:
+            URL_List.append("example.com")
+            # user feed back
+            sys.stdout.write("\n")
+            sys.stdout.write("URL_DEFAULT list returned no URL's, empty list with dummy URL (example.com) created (to avoid policy deploy failure)...\n")
 
         # Add all the fetched URLs to the 'literals' of the URL Group object
         for url in URL_default_list:
