@@ -86,12 +86,14 @@ def loadConfig():
             "WEBEX_ROOM_ID": "",
         }
 
+# check if ASA creds are set
 def isASA():
     return CONFIG_DATA['ASA_IP'] != '' \
         and CONFIG_DATA['ASA_USER'] != '' \
         and CONFIG_DATA['ASA_PASS'] != '' \
         and CONFIG_DATA['ASA_OBJECTNAME'] != ''
 
+# check if FMC creds are set
 def isFMC():
     return CONFIG_DATA['FMC_IP'] != '' \
         and CONFIG_DATA['FMC_USER'] != '' \
@@ -403,10 +405,38 @@ def WebServiceParser():
 
                     # iterate through all IPs in each item
                     for ip in item['ips']:
-
                         # if the IP hasn't already been appended, then append it
                         if ip not in IP_List:
                             IP_default_list.append(ip)
+
+            # check whether list not empty (microsoft sometimes doesn't return IP's for default IP addresses for example)
+            if not IP_List:
+                IP_list.append("240.0.0.0/4")
+                # user feed back
+                sys.stdout.write("\n")
+                sys.stdout.write("IP_BYPASS list returned no IP's, empty list with dummy IP range (240.0.0.0/4) created (to avoid policy deploy failure)...\n")
+
+            # check whether list not empty (microsoft sometimes doesn't return IP's for default IP addresses for example)
+            if not IP_default_list:
+                IP_default_list.append("240.0.0.0/4")
+                # user feed back
+                sys.stdout.write("\n")
+                sys.stdout.write("IP_DEFAULT list returned no IP's, empty list with dummy IP range (240.0.0.0/4) created (to avoid policy deploy failure)...\n")
+
+            # check whether list not empty
+            if not URL_List:
+                URL_List.append("example.com")
+                # user feed back
+                sys.stdout.write("\n")
+                sys.stdout.write("URL_BYPASS list returned no URL's, empty list with dummy URL (example.com) created (to avoid policy deploy failure)...\n")
+
+            # check whether list not empty
+            if not URL_List:
+                URL_List.append("example.com")
+                # user feed back
+                sys.stdout.write("\n")
+                sys.stdout.write("URL_DEFAULT list returned no URL's, empty list with dummy URL (example.com) created (to avoid policy deploy failure)...\n")
+
 
         if isFMC():
             # Reset the fetched Network Group object to clear the 'literals'
@@ -556,30 +586,33 @@ if __name__ == "__main__":
     # Load config data from file
     loadConfig()
 
-    deviceAnswer=input("Which device? FirePower or ASA, no or skip(f/a): ").lower().strip()[:1]
-    if deviceAnswer=="f":
-        # If not hard coded, get the FMC IP, Username, and Password
-        if CONFIG_DATA['FMC_IP'] == '':
-            CONFIG_DATA['FMC_IP'] = input("FMC IP Address: ")
-        if CONFIG_DATA['FMC_USER'] == '':
-            CONFIG_DATA['FMC_USER'] = input("\nFMC Username: ")
-        if CONFIG_DATA['FMC_PASS'] == '':
-            CONFIG_DATA['FMC_PASS'] = getpass.getpass("\nFMC Password: ")
-    elif deviceAnswer=="a":
-        # If not hard coded, get the FMC IP, Username, and Password
-        if CONFIG_DATA['ASA_IP'] == '':
-            CONFIG_DATA['ASA_IP'] = input("ASA IP Address: ")
-        if CONFIG_DATA['ASA_USER'] == '':
-            CONFIG_DATA['ASA_USER'] = input("\nASA Username: ")
-        if CONFIG_DATA['ASA_PASS'] == '':
-            CONFIG_DATA['ASA_PASS'] = getpass.getpass("\nASA Password: ")
-        if CONFIG_DATA['ASA_OBJECTNAME'] == '':
-            CONFIG_DATA['ASA_OBJECTNAME'] = input("\nASA Network Object Name: ")
-        if CONFIG_DATA['ASA_CONNECT_MODE'] == '':
-            CONFIG_DATA['ASA_CONNECT_MODE'] = input("\nASA connect Mode (API,SSH) [a/s]: ")
-    else:
-        print("Invalid device.")
-        sys.exit(1)
+    # check if either FMC or ASA creds are checked, if both are not, query user
+    if not isFMC() and not isASA():
+        print("TESTTEST")
+        deviceAnswer=input("Do you want to update an FMC [f] or ASA [a] [f/a]: ").lower().strip()[:1]
+        if deviceAnswer=="f":
+            # If not hard coded, get the FMC IP, Username, and Password
+            if CONFIG_DATA['FMC_IP'] == '':
+                CONFIG_DATA['FMC_IP'] = input("\nFMC IP Address: ")
+            if CONFIG_DATA['FMC_USER'] == '':
+                CONFIG_DATA['FMC_USER'] = input("\nFMC Username: ")
+            if CONFIG_DATA['FMC_PASS'] == '':
+                CONFIG_DATA['FMC_PASS'] = getpass.getpass("\nFMC Password: ")
+        elif deviceAnswer=="a":
+            # If not hard coded, get the FMC IP, Username, and Password
+            if CONFIG_DATA['ASA_IP'] == '':
+                CONFIG_DATA['ASA_IP'] = input("ASA IP Address: ")
+            if CONFIG_DATA['ASA_USER'] == '':
+                CONFIG_DATA['ASA_USER'] = input("\nASA Username: ")
+            if CONFIG_DATA['ASA_PASS'] == '':
+                CONFIG_DATA['ASA_PASS'] = getpass.getpass("\nASA Password: ")
+            if CONFIG_DATA['ASA_OBJECTNAME'] == '':
+                CONFIG_DATA['ASA_OBJECTNAME'] = input("\nASA Network Object Name: ")
+            if CONFIG_DATA['ASA_CONNECT_MODE'] == '':
+                CONFIG_DATA['ASA_CONNECT_MODE'] = input("\nASA connect Mode (API,SSH) [a/s]: ")
+        else:
+            print("Invalid device.")
+            sys.exit(1)
 
     # check with user which O365 service areas they are using
     if CONFIG_DATA['SERVICE_AREAS'] == '':  
