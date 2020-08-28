@@ -81,11 +81,11 @@ class Firepower:
 
         try:
             # Take the appropriate action - GET by default
-            if method is 'POST':
+            if method == 'POST':
                 http_req = requests.post(url=endpoint_url, headers=headers, json=json_data, verify=self.ssl_verify)
-            elif method is 'PUT':
+            elif method == 'PUT':
                 http_req = requests.put(url=endpoint_url, headers=headers, json=json_data, verify=self.ssl_verify)
-            elif method is 'DELETE':
+            elif method == 'DELETE':
                 http_req = requests.delete(url=endpoint_url, headers=headers, json=json_data, verify=self.ssl_verify)
             else:
                 http_req = requests.get(url=endpoint_url, headers=headers, json=json_data, verify=self.ssl_verify)
