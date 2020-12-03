@@ -72,7 +72,7 @@ These instructions will enable you to download the script and run it, so that th
 pip install -r requirements.txt
 ```
 
-9. After this is complete you need to execute the script (make sure you are in the same directory as the cloned files live):
+9. After this is complete you need to execute the script (make sure you are in the same directory as the cloned files live). When you execute the Python script, you will be prompted for information if you did not fill this in step 1.
 
 ```
 python3.6 O365WebServiceParser.py
