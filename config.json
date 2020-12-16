@@ -14,5 +14,10 @@
     "AUTO_DEPLOY": false,
     "VERSION": 0,
     "WEBEX_ACCESS_TOKEN": "",
-    "WEBEX_ROOM_ID": ""
+    "WEBEX_ROOM_ID": "",
+    "PROXY": "",
+    "PROXY_USER": "",
+    "PROXY_PASSWD": "",
+    "PROXY_HOST": "",
+    "PROXY_PORT": ""
 }

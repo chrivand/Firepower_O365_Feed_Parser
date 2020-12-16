@@ -76,6 +76,11 @@ def loadConfig():
             "VERSION":  0,
             "WEBEX_ACCESS_TOKEN": "",
             "WEBEX_ROOM_ID": "",
+            "PROXY": "",
+            "PROXY_USER": "",
+            "PROXY_PASSWD": "",
+            "PROXY_HOST": "",
+            "PROXY_PORT": "",
         }
 
 # A function to store CONFIG_DATA to file
@@ -86,6 +91,23 @@ def saveConfig():
 
     with open(CONFIG_FILE, 'w') as output_file:
         json.dump(CONFIG_DATA, output_file, indent=4)
+
+# A funtion to build the proxy config
+def build_proxy():
+
+    # If authentication required format with username and password. If not, start from host.
+    if CONFIG_DATA['PROXY_USER'] != "":
+        proxyHttp = 'http://' + CONFIG_DATA['PROXY_USER'] + ':' + CONFIG_DATA['PROXY_PASSWD'] + '@' + CONFIG_DATA['PROXY_HOST'] + ':' + CONFIG_DATA['PROXY_PORT']
+        proxyHttps = 'https://' + CONFIG_DATA['PROXY_USER'] + ':' + CONFIG_DATA['PROXY_PASSWD'] + '@' + CONFIG_DATA['PROXY_HOST'] + ':' + CONFIG_DATA['PROXY_PORT']
+    else:
+        proxyHttp = 'http://' + CONFIG_DATA['PROXY_HOST'] + ':' + CONFIG_DATA['PROXY_PORT']
+        proxyHttps = 'https://' + CONFIG_DATA['PROXY_HOST'] + ':' + CONFIG_DATA['PROXY_PORT']
+
+    # Proxy setting to use in requests
+    build_proxy.proxy = {
+        proxyHttp,
+        proxyHttps
+    }
 
 # A function to deploy pending policy pushes
 def DeployPolicies(fmc):
@@ -176,8 +198,11 @@ def check_for_new_version(clientRequestId):
     # assemble URL for get request for version 
     getURLVersion = webServiceVersionURL + clientRequestId
 
-    # do GET request 
-    reqVersion = requests.get(getURLVersion)
+    # do GET request, using proxy if proxy is set
+    if CONFIG_DATA['PROXY'] == True:
+        reqVersion = requests.get(getURLVersion, proxies=build_proxy.proxy)
+    else:
+        reqVersion = requests.get(getURLVersion)
 
     # grab output in JSON format
     version = reqVersion.json()
@@ -228,7 +253,7 @@ def WebServiceParser():
         fmc = Firepower(CONFIG_DATA)
 
         # If there's no defined Network Object, make one, then store the UUID - else, get the current object
-        if CONFIG_DATA['IP_BYPASS_UUID'] is '':
+        if CONFIG_DATA['IP_BYPASS_UUID'] == '':
 
             # Create the JSON to submit
             object_json = {
@@ -250,7 +275,7 @@ def WebServiceParser():
             ip_group_object = fmc.getObject('networkgroups', CONFIG_DATA['IP_BYPASS_UUID'])
 
         # If there's no defined Default Network Object, make one, then store the UUID - else, get the current object
-        if CONFIG_DATA["IP_DEFAULT_UUID"] is '':
+        if CONFIG_DATA["IP_DEFAULT_UUID"] == '':
             # Create the JSON to submit
             object_json = {
                 'name': OBJECT_PREFIX + "O365_IPs_DEFAULT_" + CONFIG_DATA['O365_PLAN'] + "_" + CONFIG_DATA['SERVICE_AREAS'].replace(',','_'),
@@ -269,7 +294,7 @@ def WebServiceParser():
             ip_default_group_object = fmc.getObject('networkgroups', CONFIG_DATA['IP_DEFAULT_UUID'])
 
         # If there's no defined URL Object, make one, then store the UUID
-        if CONFIG_DATA['URL_BYPASS_UUID'] is '':
+        if CONFIG_DATA['URL_BYPASS_UUID'] == '':
 
             # Create the JSON to submit
             object_json = {
@@ -289,7 +314,7 @@ def WebServiceParser():
             url_group_object = fmc.getObject('urlgroups', CONFIG_DATA['URL_BYPASS_UUID'])
 
         # If there's no defined Default URL Object, make one, then store the UUID
-        if CONFIG_DATA['URL_DEFAULT_UUID'] is '':
+        if CONFIG_DATA['URL_DEFAULT_UUID'] == '':
 
             # Create the JSON to submit
             object_json = {
@@ -319,8 +344,11 @@ def WebServiceParser():
         # assemble URL for get request
         getURL = web_service_url + clientRequestId
 
-        # do GET request 
-        req = requests.get(getURL)  
+        # do GET request, using proxy if proxy is set
+        if CONFIG_DATA['PROXY'] == True:
+            req = requests.get(getURL, proxies=build_proxy.proxy)
+        else:
+            req = requests.get(getURL)
 
         # initiate lists to be filled with addresses
         URL_List = []
@@ -527,7 +555,7 @@ if __name__ == "__main__":
                 service_areas.append("Skype")
             CONFIG_DATA['SERVICE_AREAS'] = ",".join(service_areas)
     # check with user which O365 Plan they are using
-    if CONFIG_DATA['O365_PLAN'] is '':
+    if CONFIG_DATA['O365_PLAN'] == '':
         if input("\nDo you use the default Worldwide O365 Plan (and not: Germany,USGovDoD,USGovGCCHigh,China) [y/n]: ") == "y":
             CONFIG_DATA['O365_PLAN'] = "Worldwide"
         else:
@@ -539,7 +567,20 @@ if __name__ == "__main__":
                 CONFIG_DATA['O365_PLAN'] = "USGovGCCHigh"
             elif (input("\nDo you use the China O365 Plan [y/n]: ")).lower() == "y":
                 CONFIG_DATA['O365_PLAN'] = "China"    
-    
+    # check with user if proxy is needed
+    if CONFIG_DATA['PROXY'] == '':
+        if input("\nDo you need to use a HTTP/HTTPS proxy to get to the internet [y/n]: ") == "y":
+            CONFIG_DATA['PROXY'] = "true"
+            if input("\nDoes the proxy require authentication [y/n]: ") == "y":
+                CONFIG_DATA['PROXY_USER'] = input("\nProxy Username: ")
+                CONFIG_DATA['PROXY_PASSWD'] = getpass.getpass("\nProxy password (note, this will be stored in plain text): ")
+            CONFIG_DATA['PROXY_HOST'] = input("\nHostname or IP address of the proxy: ")
+            CONFIG_DATA['PROXY_PORT'] = input("\nProxy server port number: ")
+            # build the proxy dict used by requests
+            build_proxy()
+        else:
+            CONFIG_DATA['PROXY'] = "false"
+
     sys.stdout.write(f"\nChosen O365 plan: {CONFIG_DATA['O365_PLAN']}, chosen applications: {CONFIG_DATA['SERVICE_AREAS']}\n")
     
     # Save the FMC data
