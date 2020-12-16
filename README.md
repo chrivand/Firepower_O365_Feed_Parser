@@ -1,6 +1,6 @@
 [![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/chrivand/Firepower_O365_Feed_Parser)
 
-# O365 Web Service API to Firepower Objects Parser [v4.1 MINOR]
+# O365 Web Service API to Firepower Objects Parser [v4.1.2]
 
 This is a sample script that parses the [NEW O365 Web Service API](https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g., Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent latency issues with the Microsoft O365 applications. 
 
@@ -12,10 +12,12 @@ If you would like to see a demo of the script, please check out the video below:
 
 [![Alt text](https://img.youtube.com/vi/nY9nWVrgO4I/0.jpg)](https://www.youtube.com/watch?v=nY9nWVrgO4I)
 
-## Release notes v4.1
+## Release notes v4.1.2
 
 * VERSION 4.2 in BETA now, with ASA support: https://github.com/chrivand/Firepower_O365_Feed_Parser/tree/VERSION-4.2
-* Minor update from version v4.0 that creates 4 group objects in instead of 2. 
+* Minor (v4.1.2) update from version v4.0 that creates 4 group objects in instead of 2. 
+* Minor (v4.1.2) update from version v4.0 that adds proxy support. User is prompted if proxy is needed, and if authentication for the proxy is needed. If so, user will be prompted.
+* Minor (v4.1.2) update from version v4.0 that fixed a problem with the **Common Service Area**. This was an **important bug, and is now fixed**.
 * It now creates 2 URL group objects for Optimize+Allow and for Default category, and does the same for the IP group objects.
 * [WARNING] It adds a dummy IP range (240.0.0.0/4) or dummy URL (example.com), if Microsoft does not return any addresses. Microsoft does not always return full lists. Sometimes they only return the Default URL’s for example, since they don’t own those IP ranges. This can cause a Policy Deploy failure, hence the dummy addresses.
 * Some other changes include the optimization of the script (e.g. it will only do FMC requests if a new version is detected of the O365 script).
@@ -54,7 +56,9 @@ These instructions will enable you to download the script and run it, so that th
 
 1. You need the IP address (or domain name) of the FMC, the username and password. These will be requested by the script the first time it is run. It is recommended to create a separate FMC login account for API usage, otherwise the admin will be logged out during every API calls. Add the IP/Domain of FMC, the username and password to the config.json file. If you do not add anything, you will be prompted to fill this in when executing the script. 
 
-2. The script will also prompt you for the O365 plan you are using (Worldwide, Germany, USGovDoD, USGovGCCHigh, China) and which Service Areas (Exchange, SharePoint, Skype) you are using. Potentially you can run this script multiple times to create separate objects per Service Area (for example if a set of your end-users use SharePoint, but everyone uses Exchange). Please make sure to create a separate directory with it's own version of the *config.json* file.
+2. The script will also prompt you which Service Areas (Exchange, SharePoint, Skype) you are using and which O365 plan you are using (Worldwide, Germany, USGovDoD, USGovGCCHigh, China). After this you will be prompted if you are using a proxy to go to the internet to make the API requests to Microsoft.
+
+> **Note:** Potentially you can run this script multiple times to create separate objects per Service Area (for example if a set of your end-users use SharePoint, but everyone uses Exchange). Please make sure to create a separate directory with it's own version of the *config.json* file.
 
 3. In the FMC, go to System > Configuration > REST API Preferences to make sure that the REST API is enabled on the FMC.
 
@@ -132,11 +136,11 @@ As a final step you will need to do a Policy Deploy, each time that the Group Ob
 
 I have not tested this yet but it is possible to use the created Network Group Objects for exclusion in your VPN tunnel. This can be done by creating or editing an AnyConnect Profile like below:
 
-![vpn-group-policy](vpn-group-policy.png)
+![vpn-group-policy](screenshots_FMC_O365/vpn-group-policy.png)
 
 You can then add the Network Group Object as an ACL to be excluded from the VPN tunnel (split tunneling):
 
-![vpn-acl](vpn-acl.png)
+![vpn-acl](screenshots_FMC_O365/vpn-acl.png)
 
 Please test this thorougly before using in production!
 

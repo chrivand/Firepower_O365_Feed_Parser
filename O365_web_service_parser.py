@@ -539,7 +539,7 @@ if __name__ == "__main__":
     if CONFIG_DATA['FMC_USER'] == '':
         CONFIG_DATA['FMC_USER'] = input("\nFMC Username: ")
     if CONFIG_DATA['FMC_PASS'] == '':
-        CONFIG_DATA['FMC_PASS'] = getpass.getpass("\nFMC Password: ")
+        CONFIG_DATA['FMC_PASS'] = getpass.getpass("\nFMC Password (NOTE: stored in plain text in config.json): ")
     # check with user which O365 service areas they are using
     if CONFIG_DATA['SERVICE_AREAS'] == '':  
         answer_input = (input("\nDo you use all O365 Service Areas / Applications (Exchange,SharePoint,Skype) [y/n]: ")).lower()
@@ -547,12 +547,14 @@ if __name__ == "__main__":
             CONFIG_DATA['SERVICE_AREAS'] = 'All'
         elif answer_input == "n":
             service_areas = []
-            if (input("\nDo you use Exchange [y/n]: ")).lower() == "y":
+            if (input("\nDo you use Exchange Online [y/n]: ")).lower() == "y":
                 service_areas.append("Exchange")
-            if (input("\nDo you use SharePoint [y/n]: ")).lower() == "y":
+            if (input("\nDo you use SharePoint Online and OneDrive for Business [y/n]: ")).lower() == "y":
                 service_areas.append("SharePoint")
-            if (input("\nDo you use Skype [y/n]: ")).lower() == "y":
+            if (input("\nDo you use Skype for Business Online and Microsoft Teams [y/n]: ")).lower() == "y":
                 service_areas.append("Skype")
+            if (input("\nDo you use Microsoft 365 Common and Office Online [y/n]: ")).lower() == "y":
+                service_areas.append("Common")
             CONFIG_DATA['SERVICE_AREAS'] = ",".join(service_areas)
     # check with user which O365 Plan they are using
     if CONFIG_DATA['O365_PLAN'] == '':
@@ -573,7 +575,7 @@ if __name__ == "__main__":
             CONFIG_DATA['PROXY'] = "true"
             if input("\nDoes the proxy require authentication [y/n]: ") == "y":
                 CONFIG_DATA['PROXY_USER'] = input("\nProxy Username: ")
-                CONFIG_DATA['PROXY_PASSWD'] = getpass.getpass("\nProxy password (note, this will be stored in plain text): ")
+                CONFIG_DATA['PROXY_PASSWD'] = getpass.getpass("\nProxy password (NOTE: stored in plain text in config.json): ")
             CONFIG_DATA['PROXY_HOST'] = input("\nHostname or IP address of the proxy: ")
             CONFIG_DATA['PROXY_PORT'] = input("\nProxy server port number: ")
             # build the proxy dict used by requests
