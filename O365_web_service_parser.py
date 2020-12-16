@@ -542,7 +542,7 @@ if __name__ == "__main__":
         CONFIG_DATA['FMC_PASS'] = getpass.getpass("\nFMC Password (NOTE: stored in plain text in config.json): ")
     # check with user which O365 service areas they are using
     if CONFIG_DATA['SERVICE_AREAS'] == '':  
-        answer_input = (input("\nDo you use all O365 Service Areas / Applications (Exchange,SharePoint,Skype) [y/n]: ")).lower()
+        answer_input = (input("\nDo you use all O365 Service Areas / Applications (Exchange,SharePoint,Skype,Common) [y/n]: ")).lower()
         if answer_input == "y":
             CONFIG_DATA['SERVICE_AREAS'] = 'All'
         elif answer_input == "n":
