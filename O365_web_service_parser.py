@@ -572,7 +572,7 @@ if __name__ == "__main__":
     # check with user if proxy is needed
     if CONFIG_DATA['PROXY'] == '':
         if input("\nDo you need to use a HTTP/HTTPS proxy to get to the internet [y/n]: ") == "y":
-            CONFIG_DATA['PROXY'] = "true"
+            CONFIG_DATA['PROXY'] = "True"
             if input("\nDoes the proxy require authentication [y/n]: ") == "y":
                 CONFIG_DATA['PROXY_USER'] = input("\nProxy Username: ")
                 CONFIG_DATA['PROXY_PASSWD'] = getpass.getpass("\nProxy password (NOTE: stored in plain text in config.json): ")
@@ -581,7 +581,7 @@ if __name__ == "__main__":
             # build the proxy dict used by requests
             build_proxy()
         else:
-            CONFIG_DATA['PROXY'] = "false"
+            CONFIG_DATA['PROXY'] = "False"
 
     sys.stdout.write(f"\nChosen O365 plan: {CONFIG_DATA['O365_PLAN']}, chosen applications: {CONFIG_DATA['SERVICE_AREAS']}\n")
     
