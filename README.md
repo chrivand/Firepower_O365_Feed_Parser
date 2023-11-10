@@ -6,7 +6,7 @@
 
 > **Note:** please also check out if the new Dynamic Object Feed feature might solve your use case.
 
-> **Note:** there are reports that this Scripts is incompatible with Python 3.12, please use 3.11. Feel free to do a Pull Request with a compatible version!
+> **Note:** there are reports that the script is incompatible with Python 3.12, please use 3.11. Feel free to do a Pull Request with a compatible version!
 
 This is a sample script that parses the [NEW O365 Web Service API](https://docs.microsoft.com/en-us/office365/enterprise/managing-office-365-endpoints#webservice) that Microsoft publishes with URL, IPv4 and IPv6 addresses. These addresses are used for the infrastructure of the Microsoft cloud applications (e.g., Office 365). The script will parse the NEW O365 Web Service API into 2 separate lists and use the FMC API to upload them into 2 Group Objects. These Group Objects can be used in a Firepower trust/prefilter rule. By doing so the traffic is excluded from further inspection, to prevent latency issues with the Microsoft O365 applications. 
 
